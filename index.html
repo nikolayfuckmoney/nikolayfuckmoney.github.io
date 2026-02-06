@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
+    <style>
+        * { box-sizing: border-box; }
+
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal; font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 0; padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .top-bar {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+            height: 22px;
+            display: flex;
+            align-items: center;
+        }
+
+        #marquee-text {
+            display: inline-block;
+            will-change: transform;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 60px; /* Отступ для нижней панели */
+        }
+
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .title-flag {
+            height: 18px;
+            width: auto;
+            margin-top: 1px;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 5px;
+            padding: 6px 0;
+            border-bottom: 1px solid #000000;
+            transition: color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .inst:hover {
+            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 1;
+        }
+        .tgk:hover { color: #0088cc; opacity: 1; }
+        .twitch:hover {
+            background: linear-gradient(45deg, #9146ff, #4b6cb7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 1;
+        }
+        .tiktok:hover { color: #000000; opacity: 0.6; }
+
+        .gallery-container {
+            overflow: hidden;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 0;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .gallery img {
+            width: 60vw;
+            max-width: 350px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ ВСЕГО НИЖНЕГО ФУТЕРА */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none; /* Чтобы не блокировать клики по телу */
+        }
+
+        /* ОБЩИЙ СТИЛЬ ДЛЯ КНОПОК */
+        .bottom-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            outline: none;
+            z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto; /* Вернуть клики для кнопок */
+        }
+
+        /* ОБЩИЙ СТИЛЬ ДЛЯ ТУЛТИПОВ */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+            pointer-events: auto; /* Вернуть клики для тултипов */
+        }
+
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 5px); /* ПОЯВЛЯЕТСЯ СТРОГО СВЕРХУ С ОТСТУПОМ 5PX */
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 9px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            border: 1px solid #333;
+        }
+
+        /* Выравнивание тултипа ABOUT ME по левому краю его кнопки */
+        #about-tooltip { left: 0; }
+
+        /* Выравнивание тултипа SOUND по правому краю его кнопки */
+        #sound-tooltip { right: 0; }
+
+        /* Показ тултипа при наведении на ПК */
+        @media (hover: hover) {
+            .tooltip-wrapper:hover .tooltip-content { display: block; }
+        }
+        /* Показ тултипа через класс "active" (для мобилок) */
+        .tooltip-content.active { display: block; }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="top-bar">
+        <div id="marquee-text">ALL BUTTONS CLICKABLE</div>
+    </div>
+
+    <div class="container">
+        <div class="title-wrapper">
+            <h1>HELLO, IM DNKA!</h1>
+            <img src="flag.png" alt="flag" class="title-flag">
+        </div>
+
+        <a href="https://instagram.com/ogdnka" class="link-text inst" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me/eeleve" class="link-text tgk" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv/bananapapa228" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://www.tiktok.com/@dnkanle" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://discord.com/dnka" class="link-text tiktok" target="_blank">discord: @dnka</a>
+
+        <div class="gallery-container">
+            <div id="gallery-anim" class="gallery">
+                <img src="1.png" alt="1"><img src="2.png" alt="2"><img src="3.png" alt="3"><img src="4.png" alt="4"><img src="5.png" alt="5"><img src="6.png" alt="6"><img src="7.png" alt="7">
+                <img src="1.png" alt="1"><img src="2.png" alt="2"><img src="3.png" alt="3"><img src="4.png" alt="4"><img src="5.png" alt="5"><img src="6.png" alt="6"><img src="7.png" alt="7">
+            </div>
+        </div>
+    </div>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ С КНОПКАМИ -->
+    <div class="bottom-bar">
+        <!-- КНОПКА ABOUT ME -->
+        <div class="tooltip-wrapper">
+            <button class="bottom-btn" id="about-btn-el">[ ABOUT ME ]</button>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / fuck fat girls / 11 w2026</div>
+        </div>
+
+        <!-- КНОПКА SOUND -->
+        <div class="tooltip-wrapper">
+            <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
+            <div class="tooltip-content" id="sound-tooltip">road2god - lovefool</div>
+        </div>
+    </div>
+
+
+    <script>
+        const audio = document.getElementById('bg-music');
+        const muteBtn = document.getElementById('mute-btn-el');
+        const gallery = document.getElementById('gallery-anim');
+        const marqueeEl = document.getElementById('marquee-text');
+        const aboutBtn = document.getElementById('about-btn-el');
+        const aboutTooltip = document.getElementById('about-tooltip');
+        const soundTooltip = document.getElementById('sound-tooltip');
+
+        function toggleTooltip(tooltipElement, event) {
+            event.stopPropagation();
+            if (tooltipElement === aboutTooltip) {
+                soundTooltip.classList.remove('active');
+            } else {
+                aboutTooltip.classList.remove('active');
+            }
+            tooltipElement.classList.toggle('active');
+        }
+
+        aboutBtn.addEventListener('click', (e) => toggleTooltip(aboutTooltip, e));
+        muteBtn.addEventListener('click', (e) => toggleTooltip(soundTooltip, e));
+
+        document.addEventListener('click', () => {
+            aboutTooltip.classList.remove('active');
+            soundTooltip.classList.remove('active');
+        });
+
+        const phrases = [
+            "ALL BUTTONS CLICKABLE",
+            "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX",
+            "kyplu garaj"
+        ];
+        let phraseIndex = 0;
+        let xPos = window.innerWidth;
+
+        function updateMarquee() {
+            xPos -= 2.5;
+            if (xPos < -marqueeEl.offsetWidth) {
+                xPos = window.innerWidth;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                marqueeEl.innerText = phrases[phraseIndex];
+            }
+            marqueeEl.style.transform = `translateX(${xPos}px)`;
+            requestAnimationFrame(updateMarquee);
+        }
+        updateMarquee();
+
+        let playing = false;
+        let currentPos = 0;
+        let currentSpeed = 0;
+        let targetSpeed = 0;
+        const maxSpeed = 1.2;
+        const accel = 0.03;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+
+        function animateGallery() {
+            if (currentSpeed < targetSpeed) {
+                currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
+            } else if (currentSpeed > targetSpeed) {
+                currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
+            }
+            currentPos -= currentSpeed;
+            const halfWidth = gallery.offsetWidth / 2;
+            if (Math.abs(currentPos) >= halfWidth) currentPos = 0;
+            gallery.style.transform = `translateX(${currentPos}px)`;
+            requestAnimationFrame(animateGallery);
+        }
+
+        function togglePlay() {
+            if (playing) {
+                muteBtn.innerText = "[ SOUND: OFF ]";
+                targetSpeed = 0;
+                audio.pause();
+                audio.volume = 0;
+            } else {
+                audio.volume = 1;
+                audio.play().catch(e => console.log("Sound blocked"));
+                muteBtn.innerText = "[ SOUND: ON ]";
+                targetSpeed = maxSpeed;
+            }
+            playing = !playing;
+        }
+
+        muteBtn.addEventListener('click', (e) => {
+             togglePlay();
+        });
+
+        animateGallery();
+    </script>
+</body>
+</html>
