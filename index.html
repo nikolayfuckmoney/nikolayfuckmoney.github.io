@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
+    <!-- Подключаем библиотеку для 3D -->
+    <script src="https://cdnjs.cloudflare.com"></script>
+    <style>
+        /* Курсор-прицел для интерактива */
+        * { box-sizing: border-box; cursor: crosshair; }
+        
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal; font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 0; padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* ЗАПРЕТ СКРОЛЛА САЙТА */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .top-bar {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 5px 0;
+            white-space: nowrap; 
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .marquee {
+            display: inline-block;
+            padding-left: 100%; 
+            animation: marquee 20s linear infinite; 
+        }
+
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        .container {
+            max-width: 600px; 
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 5px;
+            padding: 6px 0;
+            border-bottom: 1px solid #000000;
+            transition: opacity 0.3s ease;
+        }
+
+        .link-text:hover { opacity: 0.5; }
+
+        /* Контейнер для 3D */
+        #canvas-container {
+            width: 100%;
+            height: 300px; /* Размер 3D зоны */
+            margin: 10px 0;
+            outline: none;
+        }
+
+        .footer { margin-top: auto; padding-bottom: 20px; }
+        .footer img { width: 30px; height: auto; }
+
+        .audio-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="audio-btn" id="mute-btn">[ SOUND: OFF ]</button>
+
+    <div class="top-bar">
+        <div class="marquee">
+            FOR SALE: GARAGE IN KHARKIV REGION. ANY QUESTIONS? SMS -> TG: @EELEVEX |&nbsp;
+            YOUR AD COULD BE HERE / ABSOLUTELY FOR FREE / SMS -> TG: @EELEVEX |&nbsp;
+        </div>
+    </div>
+
+    <div class="container"> 
+        <h1>DNKA [ME] | 3D INTERACTIVE</h1>
+        
+        <a href="https://instagram.com" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <!-- ВОЗВРАЩАЕМ TIKTOK -->
+        <a href="https://www.tiktok.com" class="link-text" target="_blank">tiktok: @dnkanle</a>
+
+        <!-- 3D ОБЪЕКТ -->
+        <div id="canvas-container"></div>
+        
+        <div class="footer">
+            <img src="flag.png" alt="flag">
+        </div>
+    </div>
+
+    <script>
+        // --- 3D ГРАФИКА (Three.js) ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
+        container.appendChild(renderer.domElement);
+
+        // Создаем фигуру (Октаэдр - кристалл)
+        const geometry = new THREE.OctahedronGeometry(1.5, 0);
+        const material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        camera.position.z = 4;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        window.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // Постоянное вращение + реакция на мышь
+            mesh.rotation.x += 0.005 + (mouseY * 0.05);
+            mesh.rotation.y += 0.005 + (mouseX * 0.05);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Ресайз 3D при изменении окна
+        window.addEventListener('resize', () => {
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+        });
+
+        // --- МУЗЫКА ---
+        const audio = document.getElementById('bg-music');
+        const btn = document.getElementById('mute-btn');
+        let playing = false;
+
+        function togglePlay() {
+            if (playing) {
+                audio.pause();
+                btn.innerText = "[ SOUND: OFF ]";
+            } else {
+                audio.currentTime = 0; // ВСЕГДА С НАЧАЛА
+                audio.play();
+                btn.innerText = "[ SOUND: ON ]";
+            }
+            playing = !playing;
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlay();
+        });
+
+        document.body.addEventListener('click', () => {
+            if (!playing) togglePlay();
+        }, { once: true });
+    </script>
+</body>
+</html>
