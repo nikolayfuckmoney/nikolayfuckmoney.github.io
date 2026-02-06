@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <!-- Обновленная ссылка на иконку с параметром версии для обхода кэша -->
+    <link rel="icon" type="image/png" href="dnka_icon.png?v=1"> 
+    <style>
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #000000;
+            transition: opacity 0.3s ease;
+            text-align: left;
+        }
+
+        .link-text:hover {
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .footer img {
+            width: 40px;
+            height: auto;
+            display: inline-block;
+        }
+
+        /* Стили для галереи */
+        .gallery-container {
+            width: 100%; 
+            overflow: hidden;
+            position: relative;
+            margin-top: 40px;
+            cursor: grab; /* Курсор "хватать" */
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            /* width будет установлен JavaScript'ом */
+            transition: transform 0.3s ease-out; /* Более быстрое перелистывание */
+        }
+
+        .gallery-item {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 5px;
+            object-fit: cover; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container"> 
+        <h1>DNKA</h1>
+        
+        <a href="https://instagram.com" class="link-text" target="_blank">Instagram</a>
+        <a href="https://t.me" class="link-text" target="_blank">Telegram</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch</a>
+        <a href="https://soundcloud.com" class="link-text" target="_blank">SoundCloud</a>
+
+        <div class="gallery-container" id="galleryContainer">
+            <div class="gallery-wrapper" id="galleryWrapper">
+                <!-- Сюда JavaScript добавит изображения -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <img src="flag.png" alt="flag">
+        </div>
+    </div>
+
+    <!-- СКРИПТ ДЛЯ ГАЛЕРЕИ -->
+    <script>
+        const wrapper = document.getElementById('galleryWrapper');
+        const container = document.getElementById('galleryContainer');
+        const imageNames = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png'];
+        const itemCount = imageNames.length;
+        
+        // Клонируем изображения 3 раза для создания "бесконечного" эффекта
+        for (let i = 0; i < 3; i++) {
+            imageNames.forEach(name => {
+                const item = document.createElement('div');
+                item.classList.add('gallery-item');
+                const img = document.createElement('img');
+                img.src = name;
+                img.alt = 'Photo ' + name;
+                item.appendChild(img);
+                wrapper.appendChild(item);
+            });
+        }
+        
+        // Устанавливаем ширину wrapper'а и центрируем на среднем наборе фото
+        wrapper.style.width = `${itemCount * 300}%`;
+        let currentIndex = itemCount; 
+        updateGallery(false); // Изначальная позиция без анимации
+
+        function updateGallery(animate = true) {
+            if (animate) {
+                wrapper.style.transition = 'transform 0.3s ease-out';
+            } else {
+                wrapper.style.transition = 'none';
+            }
+            const offset = -currentIndex * 100 / (itemCount * 3);
+            wrapper.style.transform = `translateX(${offset}%)`;
+        }
+
+        // Логика перелистывания по клику
+        container.addEventListener('click', () => {
+            currentIndex++;
+            updateGallery();
+
+            // Если ушли далеко вправо, быстро телепортируемся назад в центр
+            if (currentIndex >= itemCount * 2) {
+                setTimeout(() => {
+                    currentIndex = itemCount;
+                    updateGallery(false); // Без анимации
+                }, 300); // Ждем завершения анимации
+            }
+        });
+    </script>
+</body>
+</html>
