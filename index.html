@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <link rel="icon" type="image/png" href="dnka_icon.png"> 
+    <style>
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 0 auto; /* Убрал отступы с body */
+            padding: 40px 20px; /* Добавил отступы как внутренние */
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 600px; /* Ограничиваем контейнер 600px */
+            width: 100%;
+            margin: 0 auto; /* Центрируем контейнер */
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #000000;
+            transition: opacity 0.3s ease;
+            text-align: left;
+        }
+
+        .link-text:hover {
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .footer img {
+            width: 40px;
+            height: auto;
+            display: inline-block;
+        }
+
+        /* Стили для галереи теперь внутри контейнера, наследуют max-width: 600px */
+        .gallery-container {
+            width: 100%; 
+            overflow: hidden;
+            position: relative;
+            margin-top: 40px;
+            cursor: pointer;
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 700%; 
+        }
+
+        .gallery-item {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 5px;
+            object-fit: cover; /* Чтобы фото лучше вписывались */
+        }
+    </style>
+</head>
+<body>
+    <!-- Все содержимое теперь в одном контейнере -->
+    <div class="container"> 
+        <h1>DNKA</h1>
+        
+        <a href="https://instagram.com" class="link-text" target="_blank">Instagram</a>
+        <a href="https://t.me" class="link-text" target="_blank">Telegram</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch</a>
+        <a href="https://soundcloud.com" class="link-text" target="_blank">SoundCloud</a>
+
+        <div class="gallery-container" onclick="nextSlide()">
+            <div class="gallery-wrapper" id="galleryWrapper">
+                <div class="gallery-item"><img src="1.png" alt="Photo 1"></div>
+                <div class="gallery-item"><img src="2.png" alt="Photo 2"></div>
+                <div class="gallery-item"><img src="3.png" alt="Photo 3"></div>
+                <div class="gallery-item"><img src="4.png" alt="Photo 4"></div>
+                <div class="gallery-item"><img src="5.png" alt="Photo 5"></div>
+                <div class="gallery-item"><img src="6.png" alt="Photo 6"></div>
+                <div class="gallery-item"><img src="7.png" alt="Photo 7"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <img src="flag.png" alt="flag">
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('galleryWrapper');
+        const itemCount = 7;
+        let currentIndex = 0;
+
+        function updateGallery() {
+            const offset = -currentIndex * 100 / itemCount;
+            wrapper.style.transform = `translateX(${offset}%)`;
+        }
+
+        function nextSlide() {
+            currentIndex++;
+            if (currentIndex >= itemCount) {
+                currentIndex = 0;
+            }
+            updateGallery();
+        }
+    </script>
+</body>
+</html>
