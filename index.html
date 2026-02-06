@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <style>
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #000000;
+            transition: opacity 0.3s ease;
+        }
+
+        .link-text:hover {
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin: 40px auto 0 0;
+            text-align: left;
+            width: 100%;
+        }
+
+        .footer img {
+            width: 40px;
+            height: auto;
+            display: inline-block;
+        }
+
+        /* Стили для галереи */
+        .gallery-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            margin-top: 40px;
+            cursor: pointer; /* Делаем курсор "рукой" при наведении */
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 700%; /* 7 фото по 100% */
+        }
+
+        .gallery-item {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto; /* Автоматическая высота для сохранения пропорций */
+            display: block;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DNKA</h1>
+        
+        <a href="https://instagram.com" class="link-text" target="_blank">Instagram</a>
+        <a href="https://t.me" class="link-text" target="_blank">Telegram</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch</a>
+        <a href="https://soundcloud.com" class="link-text" target="_blank">SoundCloud</a>
+
+        <!-- ГАЛЕРЕЯ -->
+        <div class="gallery-container" onclick="nextSlide()">
+            <div class="gallery-wrapper" id="galleryWrapper">
+                <!-- Загружаем 7 ваших фото -->
+                <div class="gallery-item"><img src="1.png" alt="Photo 1"></div>
+                <div class="gallery-item"><img src="2.png" alt="Photo 2"></div>
+                <div class="gallery-item"><img src="3.png" alt="Photo 3"></div>
+                <div class="gallery-item"><img src="4.png" alt="Photo 4"></div>
+                <div class="gallery-item"><img src="5.png" alt="Photo 5"></div>
+                <div class="gallery-item"><img src="6.png" alt="Photo 6"></div>
+                <div class="gallery-item"><img src="7.png" alt="Photo 7"></div>
+            </div>
+        </div>
+        <!-- КОНЕЦ ГАЛЕРЕИ -->
+        
+        <div class="footer">
+            <img src="flag.png" alt="flag">
+        </div>
+    </div>
+
+    <!-- СКРИПТ ДЛЯ ГАЛЕРЕИ -->
+    <script>
+        const wrapper = document.getElementById('galleryWrapper');
+        const itemCount = 7; // Установим количество фото вручную
+        let currentIndex = 0;
+
+        function updateGallery() {
+            const offset = -currentIndex * 100 / itemCount;
+            wrapper.style.transform = `translateX(${offset}%)`;
+        }
+
+        // Эта функция вызывается при клике на галерею
+        function nextSlide() {
+            currentIndex++;
+            if (currentIndex >= itemCount) {
+                currentIndex = 0; // Бесконечный цикл вперед
+            }
+            updateGallery();
+        }
+    </script>
+</body>
+</html>
