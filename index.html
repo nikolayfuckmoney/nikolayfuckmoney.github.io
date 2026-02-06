@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dnka links</title>
+    <link rel="icon" type="image/png" href="dnka_icon.png?v=3"> 
+    <style>
+        /* ГАРАНТИРУЕТ, что все элементы правильно считают свою ширину */
+        * {
+            box-sizing: border-box;
+        }
+        
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #000000;
+            margin: 0; /* Обнулил все внешние отступы */
+            padding: 0; /* Обнулил все внутренние отступы */
+            min-height: 100vh;
+            overflow: hidden; 
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .top-bar {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 5px 0;
+            white-space: nowrap; 
+            overflow: hidden;
+            position: relative;
+            width: 100%; /* Гарантируем ширину 100% */
+        }
+
+        .marquee {
+            display: inline-block;
+            padding-left: 100%; 
+            animation: marquee 20s linear infinite; 
+        }
+
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        .container {
+            max-width: 600px; 
+            width: 100%;
+            margin: 0 auto; /* Центрируем контейнер */
+            padding: 20px; /* Отступы для контента внутри */
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 5px;
+            padding: 6px 0;
+            border-bottom: 1px solid #000000;
+            transition: opacity 0.3s ease;
+            text-align: left;
+        }
+
+        .link-text:hover {
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .footer img {
+            width: 30px;
+            height: auto;
+            display: inline-block;
+        }
+
+        .gallery {
+            display: flex;
+            overflow-x: scroll; 
+            margin-top: 20px; 
+            gap: 0; 
+            -webkit-overflow-scrolling: touch; 
+            cursor: grab;
+            width: 100%; /* Гарантируем ширину 100% */
+        }
+        .gallery::-webkit-scrollbar { display: none; }
+        .gallery { -ms-overflow-style: none; scrollbar-width: none; } 
+        
+        .gallery img {
+            min-width: 95%; 
+            height: auto;
+            object-fit: contain; 
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="marquee">
+            FOR SALE: GARAGE IN KHARKIV REGION. ANY QUESTIONS? SMS -> TG: @EELEVEX |&nbsp;
+            FOR SALE: GARAGE IN KHARKIV REGION. ANY QUESTIONS? SMS -> TG: @EELEVEX |&nbsp;
+            FOR SALE: GARAGE IN KHARKIV REGION. ANY QUESTIONS? SMS -> TG: @EELEVEX |&nbsp;
+            &nbsp;
+            YOUR AD COULD BE HERE / ABSOLUTELY FOR FREE / SMS -> TG: @EELEVEX |&nbsp;
+        </div>
+    </div>
+
+    <div class="container"> 
+        <h1>DNKA [ME] | ALL BUTTONS CLICKABLE</h1>
+        
+        <a href="https://instagram.com/ogdnka" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me/eeleve" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv/bananapapa228" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://soundcloud.com/bananapapa228" class="link-text" target="_blank">SoundCloud: @ogdnka</a>
+
+        <div class="gallery">
+            <img src="1.png" alt="Photo 1">
+            <img src="2.png" alt="Photo 2">
+            <img src="3.png" alt="Photo 3">
+            <img src="4.png" alt="Photo 4">
+            <img src="5.png" alt="Photo 5">
+            <img src="6.png" alt="Photo 6">
+            <img src="7.png" alt="Photo 7">
+        </div>
+        
+        <div class="footer">
+            <img src="flag.png" alt="flag">
+        </div>
+    </div>
+</body>
+</html>
