@@ -46,6 +46,7 @@
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
             transition: background 0.5s ease, color 0.5s ease;
+            touch-action: none; /* Предотвращает стандартные жесты браузера, чтобы точка лучше трекалась */
         }
 
         #custom-cursor {
@@ -56,7 +57,8 @@
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            /* Плавное перемещение: 0.3s — оптимально, чтобы точка не отставала слишком сильно */
+            transition: opacity 0.5s ease, left 0.3s cubic-bezier(0.23, 1, 0.32, 1), top 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .top-bar {
@@ -209,17 +211,15 @@
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
-            
-            // Динамический текст подсказки
             soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
-            
             if (isMuted) return;
             if (isCustom) { audioDefault.pause(); audioCustom.play(); } 
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
+        // Кнопка MODE
         modeBtn.addEventListener('mousedown', startPress);
-        modeBtn.addEventListener('touchstart', startPress);
+        modeBtn.addEventListener('touchstart', (e) => { startPress(); });
         modeBtn.addEventListener('mouseup', endPress);
         modeBtn.addEventListener('touchend', endPress);
 
@@ -244,6 +244,7 @@
             }
         }
 
+        // КУРСОР: Плавное следование за касанием
         const showCursor = (e) => {
             cursor.style.opacity = '1';
             updateCursorPos(e);
@@ -252,21 +253,28 @@
         };
 
         const updateCursorPos = (e) => {
-            const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? (e.touches ? e.touches.clientX : null) : e.clientX;
-            const y = isTouch ? (e.touches ? e.touches.clientY : null) : e.clientY;
-            if (x !== null && y !== null) {
-                cursor.style.transition = 'opacity 0.5s';
+            let x, y;
+            if (e.type.startsWith('touch')) {
+                // Берем координаты первого пальца
+                x = e.touches[0].clientX;
+                y = e.touches[0].clientY;
+            } else {
+                x = e.clientX;
+                y = e.clientY;
+            }
+
+            if (x !== undefined && y !== undefined) {
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
         };
 
+        // Слушаем события перемещения по всему окну
         window.addEventListener('mousemove', showCursor);
         window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
-        window.addEventListener('touchstart', updateCursorPos);
-        window.addEventListener('touchmove', updateCursorPos);
+        window.addEventListener('touchmove', updateCursorPos, { passive: true });
+        window.addEventListener('touchstart', updateCursorPos, { passive: true });
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
