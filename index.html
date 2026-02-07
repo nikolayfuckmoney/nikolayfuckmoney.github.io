@@ -30,10 +30,10 @@
         /* КИСЛОТНЫЙ РЕЖИМ (ПНВ) */
         body.custom-mode {
             --bg-color: #000000;
-            --main-color: #39FF14; /* Весь текст и ссылки теперь зеленые */
+            --main-color: #39FF14;
             --bg-image: url('r4.6.png');
             --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35); 
-            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(0.8) saturate(5) contrast(1.35);
+            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35);
             --btn-bg: #000000;
             --btn-text: #39FF14;
             --top-bar-bg: #000000;
@@ -51,7 +51,15 @@
 
         @keyframes nv-flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
 
-        * { cursor: none !important; box-sizing: border-box; letter-spacing: -1.2px; -webkit-user-select: none; user-select: none; touch-action: none; }
+        /* ИСПРАВЛЕННЫЙ LETTER-SPACING */
+        * { 
+            cursor: none !important; 
+            box-sizing: border-box; 
+            letter-spacing: 0.5px; /* Сделал расстояние чуть больше */
+            -webkit-user-select: none; 
+            user-select: none; 
+            touch-action: none; 
+        }
 
         @font-face {
             font-family: 'Bookish Book';
@@ -141,9 +149,8 @@
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
 
-        /* ИСПРАВЛЕННОЕ ПОЛОЖЕНИЕ ТУЛТИПОВ */
         #about-tooltip { left: 0; }
-        #sound-tooltip { right: 0; } /* Выводится влево относительно правого края кнопки */
+        #sound-tooltip { right: 0; }
 
         @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
     </style>
@@ -154,7 +161,7 @@
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE       [  HOLD  TO  STOP  TEXT  ]/</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -181,9 +188,9 @@
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
             <button class="bottom-btn">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / 11 w2026</div>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="gap: 10px; display: flex;">
             <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
             <div class="tooltip-wrapper">
                 <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
@@ -208,12 +215,12 @@
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
-        const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
+        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
-            soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
+            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
             const cur = isCustom ? audioCustom : audioDefault;
             const other = isCustom ? audioDefault : audioCustom;
@@ -329,4 +336,3 @@
     </script>
 </body>
 </html>
-
