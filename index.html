@@ -18,7 +18,7 @@
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
-            letter-spacing: -1.2px; /* Буквы стоят вплотную */
+            letter-spacing: -0.8px; 
         }
 
         @font-face {
@@ -54,16 +54,43 @@
             overflow: hidden;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; }
+        /* Кнопка без фона и границ */
+        #pause-marquee-btn {
+            background: transparent;
+            color: var(--bg-color); /* Использует цвет текста верхней панели */
+            border: none;
+            height: 100%;
+            padding: 0 12px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: none;
+            z-index: 60;
+            opacity: 0.6; /* Сделал чуть прозрачнее для "еле заметного" эффекта */
+            transition: opacity 0.3s ease;
+        }
+        
+        #pause-marquee-btn:hover { opacity: 1; }
+
+        #marquee-text { white-space: nowrap; will-change: transform; flex: 1; }
 
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
             position: absolute; 
             left: 20px; top: 50%; transform: translateY(-50%);
-            width: auto; transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
+            width: auto; transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1), top 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; transition: font-size 0.8s ease, color 0.2s ease; }
+        h1 { 
+            font-size: 14px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin: 0; 
+            line-height: 1; 
+            color: var(--main-color);
+            transition: font-size 0.8s ease; 
+        }
         
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
@@ -132,6 +159,7 @@
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
+        <button id="pause-marquee-btn" class="interactive">⏸</button>
         <div id="marquee-text">ALL BUTTONS CLICKABLE</div>
     </div>
 
@@ -178,11 +206,19 @@
         const gallery = document.getElementById('gallery-anim');
         const marqueeEl = document.getElementById('marquee-text');
         const discordBtn = document.getElementById('discord-btn');
+        const pauseMarqueeBtn = document.getElementById('pause-marquee-btn');
+
+        let marqueeActive = true;
 
         modeBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             modeBtn.innerText = isDark ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+        });
+
+        pauseMarqueeBtn.addEventListener('click', () => {
+            marqueeActive = !marqueeActive;
+            pauseMarqueeBtn.innerText = marqueeActive ? "⏸" : "▶";
         });
 
         const showCursor = (e) => {
@@ -194,8 +230,8 @@
 
         const updateCursorPos = (e) => {
             const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
-            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
+            const x = isTouch ? (e.touches ? e.touches[0].clientX : null) : e.clientX;
+            const y = isTouch ? (e.touches ? e.touches[0].clientY : null) : e.clientY;
 
             if (x !== null && y !== null) {
                 if (e.type === 'touchstart') {
@@ -255,13 +291,16 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                marqueePos -= 3.0;
-                if (marqueePos < -marqueeEl.offsetWidth) {
-                    marqueePos = window.innerWidth;
-                    currentPhraseIdx = (currentPhraseIdx + 1) % marqueePhrases.length;
-                    marqueeEl.innerText = marqueePhrases[currentPhraseIdx];
+                if (marqueeActive) {
+                    marqueePos -= 3.0;
+                    if (marqueePos < -marqueeEl.offsetWidth) {
+                        marqueePos = window.innerWidth;
+                        currentPhraseIdx = (currentPhraseIdx + 1) % marqueePhrases.length;
+                        marqueeEl.innerText = marqueePhrases[currentPhraseIdx];
+                    }
+                    marqueeEl.style.transform = `translateX(${marqueePos}px)`;
                 }
-                marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+                
                 requestAnimationFrame(update);
             }
             update();
