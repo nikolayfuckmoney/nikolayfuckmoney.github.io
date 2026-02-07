@@ -46,7 +46,6 @@
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
             transition: background 0.5s ease, color 0.5s ease;
-            touch-action: none; /* Предотвращает стандартные жесты браузера, чтобы точка лучше трекалась */
         }
 
         #custom-cursor {
@@ -57,8 +56,7 @@
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
-            /* Плавное перемещение: 0.3s — оптимально, чтобы точка не отставала слишком сильно */
-            transition: opacity 0.5s ease, left 0.3s cubic-bezier(0.23, 1, 0.32, 1), top 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.5s ease;
         }
 
         .top-bar {
@@ -127,7 +125,6 @@
         }
 
         .tooltip-wrapper { position: relative; }
-
         .tooltip-content {
             display: none; position: absolute; bottom: calc(100% + 8px);
             background: var(--main-color); color: var(--bg-color); padding: 10px; font-size: 9px;
@@ -217,9 +214,9 @@
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
-        // Кнопка MODE
+        // MODE BUTTON LOGIC (HOLD FOR CUSTOM)
         modeBtn.addEventListener('mousedown', startPress);
-        modeBtn.addEventListener('touchstart', (e) => { startPress(); });
+        modeBtn.addEventListener('touchstart', startPress);
         modeBtn.addEventListener('mouseup', endPress);
         modeBtn.addEventListener('touchend', endPress);
 
@@ -244,7 +241,7 @@
             }
         }
 
-        // КУРСОР: Плавное следование за касанием
+        // ПРАВИЛЬНАЯ ЛОГИКА КУРСОРA ИЗ СТАРОГО КОДА
         const showCursor = (e) => {
             cursor.style.opacity = '1';
             updateCursorPos(e);
@@ -253,28 +250,29 @@
         };
 
         const updateCursorPos = (e) => {
-            let x, y;
-            if (e.type.startsWith('touch')) {
-                // Берем координаты первого пальца
-                x = e.touches[0].clientX;
-                y = e.touches[0].clientY;
-            } else {
-                x = e.clientX;
-                y = e.clientY;
-            }
+            const isTouch = e.type.startsWith('touch');
+            // Точный трекинг пальца через touches[0]
+            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
+            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
 
-            if (x !== undefined && y !== undefined) {
+            if (x !== null && y !== null) {
+                if (e.type === 'touchstart' || e.type === 'touchmove') {
+                    // Плавная анимация перемещения для сенсора
+                    cursor.style.transition = 'left 0.6s cubic-bezier(0.25, 1, 0.5, 1), top 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s';
+                } else {
+                    cursor.style.transition = 'opacity 0.5s';
+                }
+                
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
         };
 
-        // Слушаем события перемещения по всему окну
         window.addEventListener('mousemove', showCursor);
         window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
-        window.addEventListener('touchmove', updateCursorPos, { passive: true });
-        window.addEventListener('touchstart', updateCursorPos, { passive: true });
+        window.addEventListener('touchstart', updateCursorPos);
+        window.addEventListener('touchmove', updateCursorPos);
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
