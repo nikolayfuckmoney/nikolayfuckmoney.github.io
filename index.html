@@ -6,7 +6,7 @@
     <title>dnka links</title>
     <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; cursor: none; } /* Скрываем стандартный курсор */
 
         @font-face {
             font-family: 'Bookish Book';
@@ -16,20 +16,54 @@
 
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background: linear-gradient(-45deg, #ffffff, #e0e0e0, #ffffff, #d1d1d1);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            background: #ffffff;
             color: #000000;
             margin: 0; padding: 0;
             height: 100vh;
             overflow: hidden;
             position: relative;
+            opacity: 0; /* Для эффекта появления */
+            animation: fadeIn 0.8s ease forwards;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ЭФФЕКТ ЗЕРНА (GRAIN) */
+        .grain {
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: url('https://raw.githubusercontent.com');
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.05;
+            animation: noise 0.2s infinite;
+        }
+        @keyframes noise {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5%,-5%); }
+            20% { transform: translate(-10%,5%); }
+            30% { transform: translate(5%,-10%); }
+            40% { transform: translate(-5%,15%); }
+            50% { transform: translate(-10%,5%); }
+            60% { transform: translate(15%,0); }
+            70% { transform: translate(0,10%); }
+            80% { transform: translate(-15%,0); }
+            90% { transform: translate(10%,5%); }
+            100% { transform: translate(5%,0); }
+        }
+
+        /* КАСТОМНЫЙ КУРСОР */
+        #cursor {
+            width: 8px; height: 8px;
+            background: #000;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
         }
 
         .top-bar {
@@ -55,7 +89,7 @@
             width: 100%;
             margin: 0 auto;
             padding: 20px;
-            padding-bottom: 60px; /* Отступ для нижней панели */
+            padding-bottom: 60px;
         }
 
         .title-wrapper {
@@ -74,9 +108,7 @@
         }
 
         .title-flag {
-            height: 18px;
-            width: auto;
-            margin-top: 1px;
+            height: 18px; width: auto; margin-top: 1px;
         }
 
         .link-text {
@@ -89,23 +121,14 @@
             margin-bottom: 5px;
             padding: 6px 0;
             border-bottom: 1px solid #000000;
-            transition: color 0.3s ease, opacity 0.3s ease;
+            transition: 0.3s;
         }
 
-        .inst:hover {
-            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 1;
-        }
-        .tgk:hover { color: #0088cc; opacity: 1; }
-        .twitch:hover {
-            background: linear-gradient(45deg, #9146ff, #4b6cb7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 1;
-        }
-        .tiktok:hover { color: #000000; opacity: 0.6; }
+        .inst:hover { background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .tgk:hover { color: #0088cc; }
+        .twitch:hover { background: linear-gradient(45deg, #9146ff, #4b6cb7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .tiktok:hover { opacity: 0.6; }
+        #discord-link { cursor: pointer; }
 
         .gallery-container {
             overflow: hidden;
@@ -114,86 +137,69 @@
         }
 
         .gallery {
-            display: flex;
-            gap: 0;
-            width: max-content;
-            will-change: transform;
+            display: flex; gap: 0; width: max-content; will-change: transform;
         }
 
         .gallery img {
-            width: 60vw;
-            max-width: 350px;
-            height: auto;
-            object-fit: contain;
-            flex-shrink: 0;
-            display: block;
+            width: 60vw; max-width: 350px; height: auto; object-fit: contain; flex-shrink: 0; display: block;
         }
 
-        /* КОНТЕЙНЕР ДЛЯ ВСЕГО НИЖНЕГО ФУТЕРА */
         .bottom-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            bottom: 0; left: 0; width: 100%;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
-            pointer-events: none; /* Чтобы не блокировать клики по телу */
+            align-items: flex-end;
+            pointer-events: none;
         }
 
-        /* ОБЩИЙ СТИЛЬ ДЛЯ КНОПОК */
+        /* СТИЛЬ ДЛЯ ИМИТАЦИИ СЧЕТЧИКА */
+        .stats {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #000;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
         .bottom-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 8px 12px;
-            font-family: 'Bookish Book', sans-serif;
-            font-size: 10px;
-            text-transform: uppercase;
-            cursor: pointer;
-            outline: none;
-            z-index: 1000;
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: auto; /* Вернуть клики для кнопок */
+            background: #000; color: #fff; border: none; padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif; font-size: 10px;
+            text-transform: uppercase; pointer-events: auto;
         }
 
-        /* ОБЩИЙ СТИЛЬ ДЛЯ ТУЛТИПОВ */
-        .tooltip-wrapper {
-            position: relative;
-            display: inline-block;
-            pointer-events: auto; /* Вернуть клики для тултипов */
-        }
+        .tooltip-wrapper { position: relative; display: inline-block; pointer-events: auto; }
 
         .tooltip-content {
-            display: none;
-            position: absolute;
-            bottom: calc(100% + 5px); /* ПОЯВЛЯЕТСЯ СТРОГО СВЕРХУ С ОТСТУПОМ 5PX */
-            background-color: #000;
-            color: #fff;
-            padding: 10px;
-            font-size: 9px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            z-index: 10;
-            border: 1px solid #333;
+            display: none; position: absolute; bottom: calc(100% + 5px);
+            background-color: #000; color: #fff; padding: 10px;
+            font-size: 9px; text-transform: uppercase; white-space: nowrap;
+            z-index: 10; border: 1px solid #333;
         }
 
-        /* Выравнивание тултипа ABOUT ME по левому краю его кнопки */
         #about-tooltip { left: 0; }
-
-        /* Выравнивание тултипа SOUND по правому краю его кнопки */
         #sound-tooltip { right: 0; }
 
-        /* Показ тултипа при наведении на ПК */
         @media (hover: hover) {
             .tooltip-wrapper:hover .tooltip-content { display: block; }
         }
-        /* Показ тултипа через класс "active" (для мобилок) */
         .tooltip-content.active { display: block; }
+
+        /* Скрываем курсор на мобилках */
+        @media (max-width: 768px) {
+            #cursor { display: none; }
+            * { cursor: auto; }
+        }
 
     </style>
 </head>
 <body>
+
+    <div class="grain"></div>
+    <div id="cursor"></div>
 
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
@@ -209,11 +215,11 @@
             <img src="flag.png" alt="flag" class="title-flag">
         </div>
 
-        <a href="https://instagram.com/ogdnka" class="link-text inst" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text tgk" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://www.tiktok.com/@dnkanle" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
-        <a href="https://discord.com/dnka" class="link-text tiktok" target="_blank">discord: @dnka</a>
+        <a href="https://instagram.com" class="link-text inst" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text tgk" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://www.tiktok.com" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
+        <div id="discord-link" class="link-text tiktok">discord: @dnka</div>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
@@ -223,21 +229,19 @@
         </div>
     </div>
 
-    <!-- НИЖНЯЯ ПАНЕЛЬ С КНОПКАМИ -->
     <div class="bottom-bar">
-        <!-- КНОПКА ABOUT ME -->
         <div class="tooltip-wrapper">
             <button class="bottom-btn" id="about-btn-el">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / fuck fat girls / 11 w2026</div>
+            <div class="tooltip-content" id="about-tooltip">19 years</div>
         </div>
 
-        <!-- КНОПКА SOUND -->
+        <div class="stats">EST. 2026<br>ONLINE: 1</div>
+
         <div class="tooltip-wrapper">
             <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
             <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
         </div>
     </div>
-
 
     <script>
         const audio = document.getElementById('bg-music');
@@ -247,14 +251,27 @@
         const aboutBtn = document.getElementById('about-btn-el');
         const aboutTooltip = document.getElementById('about-tooltip');
         const soundTooltip = document.getElementById('sound-tooltip');
+        const cursor = document.getElementById('cursor');
+
+        // КУРСОР
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // КОПИРОВАНИЕ DISCORD
+        document.getElementById('discord-link').addEventListener('click', function() {
+            const nick = "@dnka";
+            navigator.clipboard.writeText(nick);
+            const originalText = this.innerText;
+            this.innerText = "COPIED!";
+            setTimeout(() => { this.innerText = originalText; }, 1500);
+        });
 
         function toggleTooltip(tooltipElement, event) {
             event.stopPropagation();
-            if (tooltipElement === aboutTooltip) {
-                soundTooltip.classList.remove('active');
-            } else {
-                aboutTooltip.classList.remove('active');
-            }
+            if (tooltipElement === aboutTooltip) soundTooltip.classList.remove('active');
+            else aboutTooltip.classList.remove('active');
             tooltipElement.classList.toggle('active');
         }
 
@@ -269,7 +286,6 @@
         const phrases = [
             "ALL BUTTONS CLICKABLE",
             "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX",
-            "VITALINA OTDAISYA DENISY, OH XO4ET CEKC"
         ];
         let phraseIndex = 0;
         let xPos = window.innerWidth;
@@ -292,18 +308,12 @@
         let targetSpeed = 0;
         const maxSpeed = 1.2;
         const accel = 0.03;
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
 
         function animateGallery() {
-            if (currentSpeed < targetSpeed) {
-                currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
-            } else if (currentSpeed > targetSpeed) {
-                currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
-            }
+            if (currentSpeed < targetSpeed) currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
+            else if (currentSpeed > targetSpeed) currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
             currentPos -= currentSpeed;
-            const halfWidth = gallery.offsetWidth / 2;
-            if (Math.abs(currentPos) >= halfWidth) currentPos = 0;
+            if (Math.abs(currentPos) >= gallery.offsetWidth / 2) currentPos = 0;
             gallery.style.transform = `translateX(${currentPos}px)`;
             requestAnimationFrame(animateGallery);
         }
@@ -311,9 +321,7 @@
         function togglePlay() {
             if (playing) {
                 muteBtn.innerText = "[ SOUND: OFF ]";
-                targetSpeed = 0;
-                audio.pause();
-                audio.volume = 0;
+                targetSpeed = 0; audio.pause(); audio.volume = 0;
             } else {
                 audio.volume = 1;
                 audio.play().catch(e => console.log("Sound blocked"));
@@ -323,10 +331,7 @@
             playing = !playing;
         }
 
-        muteBtn.addEventListener('click', (e) => {
-             togglePlay();
-        });
-
+        muteBtn.addEventListener('click', togglePlay);
         animateGallery();
     </script>
 </body>
