@@ -60,21 +60,35 @@
             width: auto; transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        /* Ускоренная смена цвета заголовка */
         h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; transition: font-size 0.8s ease, color 0.2s ease; }
         
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
 
-        /* Контейнер флага с текстом 11 */
-        .flag-container { position: relative; display: flex; align-items: center; justify-content: center; }
+        /* Центрирование текста 11 на флаге */
+        .flag-container { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 0;
+        }
         .title-flag { height: 22px; width: auto; opacity: 0; transition: opacity 0.8s ease-in-out; transition-delay: 1s; }
         .title-wrapper.moved .title-flag { opacity: 1; }
 
         .flag-text {
-            position: absolute; color: #fff; font-size: 8px; font-weight: bold;
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            position: absolute; 
+            color: #fff; 
+            font-size: 10px; /* Сделал чуть больше */
+            font-weight: bold;
+            opacity: 0; 
+            transition: opacity 0.3s ease; 
+            pointer-events: none;
             z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            letter-spacing: 0;
         }
         body.dark-mode .flag-text { opacity: 1; }
 
