@@ -29,16 +29,16 @@
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
+            /* Начальный transition для появления */
             transition: width 0.2s, height 0.2s, opacity 0.5s ease;
         }
         .cursor-hover { width: 12px !important; height: 12px !important; }
 
-        /* ИСПРАВЛЕНО: Убрана лишняя анимация высоты, оставлен только opacity */
         .top-bar {
             background: #000; color: #fff; font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: opacity 0.8s ease; z-index: 50;
-            overflow: hidden; /* Чтобы текст не вылезал до появления */
+            overflow: hidden;
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
@@ -166,6 +166,7 @@
         const marqueeEl = document.getElementById('marquee-text');
         const discordBtn = document.getElementById('discord-btn');
 
+        // Появление курсора при первом взаимодействии
         const showCursor = (e) => {
             cursor.style.opacity = '1';
             updateCursorPos(e);
@@ -174,9 +175,20 @@
         };
 
         const updateCursorPos = (e) => {
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            const isTouch = e.type.startsWith('touch');
+            const x = isTouch ? e.touches[0].clientX : e.clientX;
+            const y = isTouch ? e.touches[0].clientY : e.clientY;
+
             if (x && y) {
+                // Если это тап (touchstart), включаем плавное подплывание
+                if (e.type === 'touchstart') {
+                    cursor.style.transition = 'left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s, height 0.2s, opacity 0.5s';
+                } 
+                // Если ведем или мышь — убираем transition перемещения для резкого отклика
+                else {
+                    cursor.style.transition = 'width 0.2s, height 0.2s, opacity 0.5s';
+                }
+
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
@@ -185,6 +197,7 @@
         window.addEventListener('mousemove', showCursor);
         window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
+        window.addEventListener('touchstart', updateCursorPos);
         window.addEventListener('touchmove', updateCursorPos);
 
         document.querySelectorAll('.interactive').forEach(el => {
@@ -213,7 +226,6 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
-                        // Сразу делаем видимой без эффекта развертывания
                         document.getElementById('top-bar').style.opacity = '1';
                         startAnimations();
                     }, 1000);
