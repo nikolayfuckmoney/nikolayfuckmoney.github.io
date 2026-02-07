@@ -10,6 +10,7 @@
             --main-color: #000000;
             --bg-image: none;
             --gallery-filter: grayscale(100%);
+            --overlay: none;
         }
 
         body.dark-mode {
@@ -21,8 +22,10 @@
         body.custom-mode {
             --bg-color: #0a0a0a;
             --main-color: #39FF14; 
-            --bg-image: url('r4.6.png');
+            --bg-image: url('https://w.wallhaven.cc'); /* Ссылка на фон */
             --gallery-filter: sepia(100%) hue-rotate(70deg) brightness(1.2) saturate(1.5);
+            --overlay: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), 
+                       repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
         }
 
         * { 
@@ -44,7 +47,7 @@
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image: var(--bg-image);
+            background-image: var(--overlay), var(--bg-image);
             background-size: cover;
             background-position: center;
             color: var(--main-color);
@@ -128,6 +131,7 @@
             background: var(--main-color); color: var(--bg-color); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
             text-transform: uppercase; transition: background 0.5s, color 0.5s;
+            touch-action: none;
         }
 
         .tooltip-wrapper { position: relative; }
@@ -162,10 +166,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -210,8 +214,6 @@
 
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0;
-
-        // Скорость бегущей строки
         let marqueeCurrentSpeed = 2.0;
         let marqueeTargetSpeed = 2.0;
 
@@ -231,40 +233,39 @@
             }
         }
 
-        const startHold = () => {
+        // Исправленная логика переключения для мобилок и ПК
+        const handleStart = (e) => {
             pressTimer = setTimeout(() => {
-                document.body.classList.toggle('custom-mode');
+                document.body.classList.add('custom-mode');
                 document.body.classList.remove('dark-mode');
-                if (!document.body.classList.contains('custom-mode') && isDarkMode) {
-                    document.body.classList.add('dark-mode');
+                setModeText();
+                updateMusic();
+                pressTimer = null;
+            }, 800); // 800мс для зажатия
+        };
+
+        const handleEnd = (e) => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                // Если отпустили раньше таймера — это обычный клик
+                if (document.body.classList.contains('custom-mode')) {
+                    document.body.classList.remove('custom-mode');
+                } else {
+                    isDarkMode = !isDarkMode;
+                    document.body.classList.toggle('dark-mode', isDarkMode);
                 }
                 setModeText();
                 updateMusic();
                 pressTimer = null;
-            }, 1000);
-        };
-
-        const endHold = () => {
-            if (pressTimer) {
-                clearTimeout(pressTimer);
-                if (document.body.classList.contains('custom-mode')) return;
-                isDarkMode = !isDarkMode;
-                document.body.classList.toggle('dark-mode', isDarkMode);
-                setModeText();
-                pressTimer = null;
             }
         };
 
-        modeBtn.addEventListener('mousedown', startHold);
-        modeBtn.addEventListener('touchstart', (e) => { startHold(); });
-        modeBtn.addEventListener('mouseup', endHold);
-        modeBtn.addEventListener('touchend', endHold);
+        // Pointer events работают везде (и мышь, и тач)
+        modeBtn.addEventListener('pointerdown', handleStart);
+        window.addEventListener('pointerup', handleEnd);
 
-        // Плавная остановка строки
-        topBar.addEventListener('mousedown', () => marqueeTargetSpeed = 0);
-        topBar.addEventListener('touchstart', () => marqueeTargetSpeed = 0);
-        window.addEventListener('mouseup', () => marqueeTargetSpeed = 2.0);
-        window.addEventListener('touchend', () => marqueeTargetSpeed = 2.0);
+        topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
+        window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
@@ -277,7 +278,6 @@
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
-        document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -319,7 +319,6 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                // Плавное изменение скорости строки (LERP)
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed; 
                 
@@ -348,4 +347,3 @@
     </script>
 </body>
 </html>
-
