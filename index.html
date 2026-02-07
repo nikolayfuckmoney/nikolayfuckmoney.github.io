@@ -18,9 +18,7 @@
             background: #ffffff; color: #000000;
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; 
-            align-items: center;
-            /* 3. Буквы ближе друг к другу по всему сайту */
-            letter-spacing: -0.5px;
+            align-items: center; letter-spacing: -0.5px;
         }
 
         #custom-cursor {
@@ -38,29 +36,32 @@
 
         #marquee-text { white-space: nowrap; will-change: transform; }
 
-        /* 2. Заголовок слева, как кнопки */
         .title-wrapper {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 10px;
             position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
             transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
+        
         .title-wrapper.moved { 
-            top: 45px; 
-            left: 20px; /* Привязка к левому краю */
+            top: 40px; 
+            left: 20px; 
             transform: translate(0, 0); 
         }
 
-        h1 { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 0; }
-        .title-flag { height: 18px; width: auto; opacity: 0; transition: 0.5s; }
+        /* 1. Увеличенный заголовок */
+        h1 { font-size: 24px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; }
+        .title-flag { height: 22px; width: auto; opacity: 0; transition: 0.5s; }
         .title-wrapper.moved .title-flag { opacity: 1; }
 
         .content-fade { 
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
-            padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
+            padding: 20px; 
+            margin-top: 65px; /* Поближе к заголовку */
+            width: 100%; max-width: 500px;
             display: flex; flex-direction: column;
-            align-self: flex-start; margin-left: 0; /* Контент прижат влево */
+            align-self: flex-start;
         }
-        /* Центрируем контейнер на широких экранах, но оставляем текст слева */
+
         @media (min-width: 500px) {
             body { align-items: center; }
             .content-fade { align-self: center; }
@@ -68,6 +69,8 @@
         }
         @media (max-width: 500px) {
             .title-wrapper.moved { left: 20px; }
+            h1 { font-size: 22px; } /* Чуть меньше на моб, чтобы влезло */
+            .content-fade { margin-top: 55px; }
         }
 
         .content-fade.visible { opacity: 1; visibility: visible; }
@@ -79,9 +82,10 @@
         }
         .link-text:hover { color: #666; }
 
-        .gallery-container { overflow: hidden; width: 100%; margin-top: 25px; font-size: 0; }
+        /* 3. Карусель поменьше */
+        .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; font-size: 0; }
         .gallery { display: flex; width: max-content; will-change: transform; }
-        .gallery img { width: 300px; height: auto; display: inline-block; margin: 0; padding: 0; }
+        .gallery img { width: 250px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -103,6 +107,7 @@
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
+        
         #about-tooltip { left: 0; }
         #sound-tooltip { right: 0; }
     </style>
@@ -137,7 +142,6 @@
     </div>
 
     <div class="bottom-bar">
-        <!-- 1. Убрана кнопка онлайн -->
         <div class="tooltip-wrapper">
             <button class="bottom-btn interactive">[ ABOUT ME ]</button>
             <div class="tooltip-content" id="about-tooltip">19 years / love money / 11 w2026</div>
@@ -185,7 +189,6 @@
             }
         }
 
-        // 4. Плавный запуск (инерция)
         let currentSpeed = 0;
         let targetSpeed = 0;
         let galleryPos = 0;
@@ -193,9 +196,7 @@
 
         function startAnimations() {
             function update() {
-                // Плавное изменение скорости (интерполяция)
                 currentSpeed += (targetSpeed - currentSpeed) * 0.05;
-
                 galleryPos -= currentSpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
@@ -203,7 +204,6 @@
                 marqueePos -= 1.5;
                 if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
-                
                 requestAnimationFrame(update);
             }
             update();
@@ -213,11 +213,11 @@
             if (audio.paused) {
                 audio.play();
                 muteBtn.innerText = "[ SOUND: ON ]";
-                targetSpeed = 1.2; // Целевая скорость
+                targetSpeed = 1.2;
             } else {
                 audio.pause();
                 muteBtn.innerText = "[ SOUND: OFF ]";
-                targetSpeed = 0; // Плавная остановка
+                targetSpeed = 0;
             }
         });
 
