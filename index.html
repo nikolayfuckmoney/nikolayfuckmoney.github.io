@@ -22,10 +22,11 @@
         body.custom-mode {
             --bg-color: #0a0a0a;
             --main-color: #39FF14; 
-            --bg-image: url('https://w.wallhaven.cc'); /* Ссылка на фон */
+            --bg-image: url('r4.6.png'); 
             --gallery-filter: sepia(100%) hue-rotate(70deg) brightness(1.2) saturate(1.5);
-            --overlay: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), 
-                       repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+            /* Эффект затемнения и полосок поверх твоего фото r4.6.png */
+            --overlay: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%), 
+                       repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
         }
 
         * { 
@@ -233,7 +234,6 @@
             }
         }
 
-        // Исправленная логика переключения для мобилок и ПК
         const handleStart = (e) => {
             pressTimer = setTimeout(() => {
                 document.body.classList.add('custom-mode');
@@ -241,15 +241,16 @@
                 setModeText();
                 updateMusic();
                 pressTimer = null;
-            }, 800); // 800мс для зажатия
+            }, 800); 
         };
 
         const handleEnd = (e) => {
             if (pressTimer) {
                 clearTimeout(pressTimer);
-                // Если отпустили раньше таймера — это обычный клик
                 if (document.body.classList.contains('custom-mode')) {
                     document.body.classList.remove('custom-mode');
+                    // Возвращаемся к текущему режиму (светлый/темный)
+                    document.body.classList.toggle('dark-mode', isDarkMode);
                 } else {
                     isDarkMode = !isDarkMode;
                     document.body.classList.toggle('dark-mode', isDarkMode);
@@ -260,7 +261,6 @@
             }
         };
 
-        // Pointer events работают везде (и мышь, и тач)
         modeBtn.addEventListener('pointerdown', handleStart);
         window.addEventListener('pointerup', handleEnd);
 
