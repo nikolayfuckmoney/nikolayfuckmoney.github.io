@@ -29,7 +29,7 @@
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center; letter-spacing: -0.5px;
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: background 0.5s ease;
         }
 
         #custom-cursor {
@@ -60,13 +60,23 @@
             width: auto; transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; transition: font-size 0.8s ease; }
+        /* Ускоренная смена цвета заголовка */
+        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; transition: font-size 0.8s ease, color 0.2s ease; }
         
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
 
+        /* Контейнер флага с текстом 11 */
+        .flag-container { position: relative; display: flex; align-items: center; justify-content: center; }
         .title-flag { height: 22px; width: auto; opacity: 0; transition: opacity 0.8s ease-in-out; transition-delay: 1s; }
         .title-wrapper.moved .title-flag { opacity: 1; }
+
+        .flag-text {
+            position: absolute; color: #fff; font-size: 8px; font-weight: bold;
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            z-index: 2;
+        }
+        body.dark-mode .flag-text { opacity: 1; }
 
         .content-fade { 
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
@@ -79,7 +89,7 @@
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
-            border-bottom: 1px solid var(--main-color); transition: color 0.3s, border-bottom 0.5s;
+            border-bottom: 1px solid var(--main-color); transition: color 0.2s, border-bottom 0.5s;
         }
         .link-text:hover { opacity: 0.6; }
 
@@ -89,7 +99,7 @@
 
         .copyright {
             font-size: 8px; text-transform: uppercase; color: var(--main-color);
-            margin-top: 15px; letter-spacing: 1px; transition: color 0.5s;
+            margin-top: 15px; letter-spacing: 1px; transition: color 0.2s;
         }
 
         .bottom-bar {
@@ -138,7 +148,10 @@
 
     <div class="title-wrapper" id="main-title">
         <h1 id="typewriter-title"></h1>
-        <img src="flag.png" alt="flag" class="title-flag">
+        <div class="flag-container">
+            <img src="flag.png" alt="flag" class="title-flag">
+            <span class="flag-text">11</span>
+        </div>
     </div>
 
     <div class="content-fade" id="main-content">
@@ -196,11 +209,10 @@
 
         const updateCursorPos = (e) => {
             const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? e.touches[0].clientX : e.clientX;
-            const y = isTouch ? e.touches[0].clientY : e.clientY;
+            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
+            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
 
-            if (x && y) {
-                // ПЛАВНОЕ ПЛЫТИЕ ПРИ КАСАНИИ
+            if (x !== null && y !== null) {
                 if (e.type === 'touchstart') {
                     cursor.style.transition = 'left 0.6s cubic-bezier(0.25, 1, 0.5, 1), top 0.6s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s, height 0.2s, opacity 0.5s';
                 } else {
