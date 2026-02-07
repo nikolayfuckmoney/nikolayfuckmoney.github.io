@@ -21,13 +21,14 @@
             align-items: center; letter-spacing: -0.5px;
         }
 
+        /* КУРСОР ПОВЕРХ ВСЕГО */
         #custom-cursor {
-            width: 6px; height: 6px; background: #000; border-radius: 50%;
-            position: fixed; pointer-events: none; z-index: 10001;
+            width: 6px; height: 6px; border-radius: 50%;
+            position: fixed; pointer-events: none; 
+            z-index: 999999 !important; 
             transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
-            /* Инверсия цвета при наведении на черный */
             mix-blend-mode: difference;
-            background: #fff; /* В режиме difference белый на белом даст черный, а белый на черном — белый */
+            background: #fff;
         }
         .cursor-hover { width: 12px !important; height: 12px !important; }
 
@@ -39,10 +40,11 @@
 
         #marquee-text { white-space: nowrap; will-change: transform; }
 
+        /* ЗАГОЛОВОК СЛЕВА ПРИ ВХОДЕ */
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
             position: absolute; 
-            left: 20px; top: 50%; transform: translateY(-50%); /* Слева при входе */
+            left: 20px; top: 50%; transform: translateY(-50%);
             width: auto; transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
@@ -73,10 +75,11 @@
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
+        /* КОПИРАЙТ МЕНЬШЕ И ЧЕРНЫЙ */
         .copyright {
-            font-size: 8px; /* Уменьшил */
+            font-size: 8px;
             text-transform: uppercase;
-            color: #000; /* Черный */
+            color: #000;
             margin-top: 15px;
             letter-spacing: 1px;
         }
