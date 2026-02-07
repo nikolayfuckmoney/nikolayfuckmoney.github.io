@@ -6,14 +6,7 @@
     <title>dnka links</title>
     <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
     <style>
-        /* Базовые настройки */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        /* Скрываем курсор ТОЛЬКО на десктопах с мышью */
-        @media (hover: hover) and (pointer: fine) {
-            html, body, a, button, div { cursor: none !important; }
-            #cursor { display: block; }
-        }
+        * { box-sizing: border-box; }
 
         @font-face {
             font-family: 'Bookish Book';
@@ -23,121 +16,170 @@
 
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background: #ffffff;
+            background: #ffffff; /* Установлен белый фон */
             color: #000000;
             margin: 0; padding: 0;
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
             position: relative;
-            opacity: 0;
-            animation: fadeIn 0.8s ease forwards;
-        }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* ЗЕРНО */
-        .grain {
-            position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: url('https://raw.githubusercontent.com');
-            pointer-events: none;
-            z-index: 9998;
-            opacity: 0.04;
-            animation: noise 0.2s infinite;
-        }
-        @keyframes noise {
-            0% { transform: translate(0,0); }
-            50% { transform: translate(-5%, 5%); }
-            100% { transform: translate(5%, -5%); }
-        }
-
-        /* КУРСОР */
-        #cursor {
-            width: 8px; height: 8px;
-            background: #000;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            transform: translate(-50%, -50%);
-            display: none;
         }
 
         .top-bar {
-            background-color: #000000; color: #ffffff;
-            font-size: 10px; padding: 5px 0;
-            white-space: nowrap; overflow: hidden;
-            width: 100%; height: 22px;
-            display: flex; align-items: center;
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+            height: 22px;
+            display: flex;
+            align-items: center;
         }
 
-        #marquee-text { display: inline-block; will-change: transform; }
+        #marquee-text {
+            display: inline-block;
+            will-change: transform;
+        }
 
         .container {
-            max-width: 600px; width: 100%; margin: 0 auto;
-            padding: 20px 20px 100px 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 60px;
         }
 
-        .title-wrapper { display: flex; align-items: center; gap: 5px; margin-bottom: 15px; }
-        h1 { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: -0.5px; }
-        .title-flag { height: 18px; width: auto; }
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .title-flag {
+            height: 18px;
+            width: auto;
+            margin-top: 1px;
+        }
 
         .link-text {
-            display: block; font-weight: bold; font-size: 13px;
-            text-transform: uppercase; color: #000000;
-            text-decoration: none; margin-bottom: 5px;
-            padding: 10px 0; border-bottom: 1px solid #000000;
-            transition: 0.3s;
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #000000;
+            text-decoration: none;
+            margin-bottom: 5px;
+            padding: 6px 0;
+            border-bottom: 1px solid #000000;
+            transition: color 0.3s ease, opacity 0.3s ease;
         }
 
-        .inst:hover { background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tgk:hover { color: #0088cc; }
-        .twitch:hover { background: linear-gradient(45deg, #9146ff, #4b6cb7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .inst:hover {
+            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 1;
+        }
+        .tgk:hover { color: #0088cc; opacity: 1; }
+        .twitch:hover {
+            background: linear-gradient(45deg, #9146ff, #4b6cb7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 1;
+        }
+        .tiktok:hover { color: #000000; opacity: 0.6; }
 
-        .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
-        .gallery { display: flex; gap: 0; width: max-content; will-change: transform; }
-        .gallery img { width: 60vw; max-width: 350px; height: auto; display: block; }
+        .gallery-container {
+            overflow: hidden;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 0;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .gallery img {
+            width: 60vw;
+            max-width: 350px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
 
         .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            padding: 15px 20px; display: flex;
-            justify-content: space-between; align-items: flex-end;
-            pointer-events: none; z-index: 9999;
-        }
-
-        .stats {
-            position: absolute; left: 50%; transform: translateX(-50%);
-            font-size: 8px; color: #000; text-align: center; letter-spacing: 1px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
         }
 
         .bottom-btn {
-            background: #000; color: #fff; border: none; padding: 8px 12px;
-            font-family: 'Bookish Book', sans-serif; font-size: 10px;
-            text-transform: uppercase; pointer-events: auto;
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            outline: none;
+            z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto;
         }
 
-        .tooltip-wrapper { position: relative; display: inline-block; pointer-events: auto; }
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+            pointer-events: auto;
+        }
+
         .tooltip-content {
-            display: none; position: absolute; bottom: calc(100% + 5px);
-            background-color: #000; color: #fff; padding: 10px;
-            font-size: 9px; text-transform: uppercase; white-space: nowrap;
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 5px);
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 9px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
             border: 1px solid #333;
         }
 
         #about-tooltip { left: 0; }
         #sound-tooltip { right: 0; }
 
-        @media (hover: hover) { .tooltip-wrapper:hover .tooltip-content { display: block; } }
+        @media (hover: hover) {
+            .tooltip-wrapper:hover .tooltip-content { display: block; }
+        }
         .tooltip-content.active { display: block; }
+
     </style>
 </head>
 <body>
 
-    <div class="grain"></div>
-    <div id="cursor"></div>
-
-    <audio id="bg-music" loop preload="auto">
+    <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
 
@@ -155,7 +197,7 @@
         <a href="https://t.me" class="link-text tgk" target="_blank">tgk: @11</a>
         <a href="https://twitch.tv" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
         <a href="https://www.tiktok.com" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
-        <div id="discord-link" class="link-text">discord: @dnka</div>
+        <a href="https://discord.com" class="link-text tiktok" target="_blank">discord: @dnka</a>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
@@ -168,10 +210,8 @@
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
             <button class="bottom-btn" id="about-btn-el">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years</div>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / fuck fat girls / 11 w2026</div>
         </div>
-
-        <div class="stats">EST. 2026<br>ONLINE: 1</div>
 
         <div class="tooltip-wrapper">
             <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
@@ -187,80 +227,85 @@
         const aboutBtn = document.getElementById('about-btn-el');
         const aboutTooltip = document.getElementById('about-tooltip');
         const soundTooltip = document.getElementById('sound-tooltip');
-        const cursor = document.getElementById('cursor');
 
-        // КУРСОР: только для ПК
-        if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-            });
+        function toggleTooltip(tooltipElement, event) {
+            event.stopPropagation();
+            if (tooltipElement === aboutTooltip) {
+                soundTooltip.classList.remove('active');
+            } else {
+                aboutTooltip.classList.remove('active');
+            }
+            tooltipElement.classList.toggle('active');
         }
 
-        // КОПИРОВАНИЕ DISCORD
-        document.getElementById('discord-link').addEventListener('click', function() {
-            navigator.clipboard.writeText("@dnka").then(() => {
-                const oldText = this.innerText;
-                this.innerText = "COPIED!";
-                setTimeout(() => { this.innerText = oldText; }, 1500);
-            });
-        });
-
-        // ТУЛТИПЫ
-        function toggleTooltip(el, ev) {
-            ev.stopPropagation();
-            if (el === aboutTooltip) soundTooltip.classList.remove('active');
-            else aboutTooltip.classList.remove('active');
-            el.classList.toggle('active');
-        }
         aboutBtn.addEventListener('click', (e) => toggleTooltip(aboutTooltip, e));
+        muteBtn.addEventListener('click', (e) => toggleTooltip(soundTooltip, e));
 
         document.addEventListener('click', () => {
             aboutTooltip.classList.remove('active');
             soundTooltip.classList.remove('active');
         });
 
-        // БЕГУЩАЯ СТРОКА
-        const phrases = ["ALL BUTTONS CLICKABLE", "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX"];
-        let pIdx = 0, xPos = window.innerWidth;
-        function moveMarquee() {
-            xPos -= 2;
+        const phrases = [
+            "ALL BUTTONS CLICKABLE",
+            "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX",
+            "VITALINA OTDAISYA DENISY, OH XO4ET CEKC"
+        ];
+        let phraseIndex = 0;
+        let xPos = window.innerWidth;
+
+        function updateMarquee() {
+            xPos -= 2.5;
             if (xPos < -marqueeEl.offsetWidth) {
                 xPos = window.innerWidth;
-                pIdx = (pIdx + 1) % phrases.length;
-                marqueeEl.innerText = phrases[pIdx];
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                marqueeEl.innerText = phrases[phraseIndex];
             }
             marqueeEl.style.transform = `translateX(${xPos}px)`;
-            requestAnimationFrame(moveMarquee);
+            requestAnimationFrame(updateMarquee);
         }
-        moveMarquee();
+        updateMarquee();
 
-        // ГАЛЕРЕЯ И ЗВУК
-        let playing = false, gPos = 0, gSpeed = 0, targetG = 0;
-        function animG() {
-            if (gSpeed < targetG) gSpeed = Math.min(gSpeed + 0.03, targetG);
-            else if (gSpeed > targetG) gSpeed = Math.max(gSpeed - 0.03, targetG);
-            gPos -= gSpeed;
-            if (Math.abs(gPos) >= gallery.offsetWidth / 2) gPos = 0;
-            gallery.style.transform = `translateX(${gPos}px)`;
-            requestAnimationFrame(animG);
+        let playing = false;
+        let currentPos = 0;
+        let currentSpeed = 0;
+        let targetSpeed = 0;
+        const maxSpeed = 1.2;
+        const accel = 0.03;
+
+        function animateGallery() {
+            if (currentSpeed < targetSpeed) {
+                currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
+            } else if (currentSpeed > targetSpeed) {
+                currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
+            }
+            currentPos -= currentSpeed;
+            const halfWidth = gallery.offsetWidth / 2;
+            if (Math.abs(currentPos) >= halfWidth) currentPos = 0;
+            gallery.style.transform = `translateX(${currentPos}px)`;
+            requestAnimationFrame(animateGallery);
         }
-        animG();
 
-        muteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleTooltip(soundTooltip, e);
-            if (!playing) {
-                audio.play().catch(() => {});
-                muteBtn.innerText = "[ SOUND: ON ]";
-                targetG = 1.2;
-            } else {
-                audio.pause();
+        function togglePlay() {
+            if (playing) {
                 muteBtn.innerText = "[ SOUND: OFF ]";
-                targetG = 0;
+                targetSpeed = 0;
+                audio.pause();
+                audio.volume = 0;
+            } else {
+                audio.volume = 1;
+                audio.play().catch(e => console.log("Sound blocked"));
+                muteBtn.innerText = "[ SOUND: ON ]";
+                targetSpeed = maxSpeed;
             }
             playing = !playing;
+        }
+
+        muteBtn.addEventListener('click', (e) => {
+             togglePlay();
         });
+
+        animateGallery();
     </script>
 </body>
 </html>
