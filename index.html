@@ -104,7 +104,7 @@
 
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
-            margin-top: 5px; /* Минимальный отступ от фото */
+            margin-top: 5px;
             transition: color 0.5s; 
         }
 
@@ -209,41 +209,42 @@
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
-        modeBtn.addEventListener('mousedown', (e) => {
-            pressTimer = setTimeout(() => {
-                document.body.classList.remove('dark-mode');
-                document.body.classList.toggle('custom-mode');
-                const isCustom = document.body.classList.contains('custom-mode');
-                modeBtn.innerText = isCustom ? "[ MODE: CUSTOM ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
-                updateMusic();
-                pressTimer = null;
-            }, 1000); 
-        });
+        function setModeText() {
+            if (document.body.classList.contains('custom-mode')) {
+                modeBtn.innerText = "[ MODE: CUSTOM ]";
+            } else {
+                modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+            }
+        }
 
-        modeBtn.addEventListener('touchstart', (e) => {
+        const startHold = () => {
             pressTimer = setTimeout(() => {
-                document.body.classList.remove('dark-mode');
                 document.body.classList.toggle('custom-mode');
-                const isCustom = document.body.classList.contains('custom-mode');
-                modeBtn.innerText = isCustom ? "[ MODE: CUSTOM ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                document.body.classList.remove('dark-mode');
+                if (!document.body.classList.contains('custom-mode') && isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                }
+                setModeText();
                 updateMusic();
                 pressTimer = null;
             }, 1000);
-        });
+        };
 
-        const endPress = (e) => {
+        const endHold = () => {
             if (pressTimer) {
                 clearTimeout(pressTimer);
                 if (document.body.classList.contains('custom-mode')) return;
                 isDarkMode = !isDarkMode;
                 document.body.classList.toggle('dark-mode', isDarkMode);
-                modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+                setModeText();
                 pressTimer = null;
             }
         };
 
-        modeBtn.addEventListener('mouseup', endPress);
-        modeBtn.addEventListener('touchend', endPress);
+        modeBtn.addEventListener('mousedown', startHold);
+        modeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+        modeBtn.addEventListener('mouseup', endHold);
+        modeBtn.addEventListener('touchend', endHold);
 
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
@@ -298,9 +299,8 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                // Моментальное переключение фраз без большой паузы
                 marqueePos -= 2.0; 
-                if (marqueePos < -marqueeEl.offsetWidth - 20) { // Небольшой зазор в 20px
+                if (marqueePos < -marqueeEl.offsetWidth - 20) {
                     marqueePos = window.innerWidth;
                     phraseIndex = (phraseIndex + 1) % phrases.length;
                     marqueeEl.innerText = phrases[phraseIndex];
