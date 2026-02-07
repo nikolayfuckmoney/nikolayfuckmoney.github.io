@@ -14,6 +14,8 @@
             --overlay: none;
             --btn-bg: #000000;
             --btn-text: #ffffff;
+            --top-bar-bg: #000000;
+            --top-bar-text: #ffffff;
         }
 
         body.dark-mode {
@@ -21,24 +23,31 @@
             --main-color: #ffffff;
             --btn-bg: #ffffff;
             --btn-text: #000000;
+            --top-bar-bg: #ffffff;
+            --top-bar-text: #000000;
         }
 
-        /* КИСЛОТНЫЙ РЕЖИМ ПНВ С ГЛУБОКИМ ЧЕРНЫМ */
+        /* КИСЛОТНЫЙ РЕЖИМ (ПНВ) С ОПТИМИЗИРОВАННЫМ КОНТРАСТОМ */
         body.custom-mode {
             --bg-color: #000000;
             --main-color: #000000;
             --bg-image: url('r4.6.png');
-            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(0.8) saturate(6) contrast(1.8); 
-            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(0.8) saturate(6) contrast(1.8);
+            
+            /* Снижен контраст (с 1.8 до 1.35) и поднята яркость (с 0.8 до 1.0) для видимости деталей */
+            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35); 
+            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35);
+            
             --btn-bg: #000000;
             --btn-text: #39FF14;
+            --top-bar-bg: #000000;
+            --top-bar-text: #39FF14;
 
             background-blend-mode: multiply;
             background-color: #39FF14; 
 
             --overlay:
-                radial-gradient(circle, transparent 20%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.9) 100%),
-                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.08) 0px, rgba(57, 255, 20, 0.08) 1px, transparent 2px, transparent 4px);
+                radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
+                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
 
             animation: nv-flicker 0.1s infinite;
         }
@@ -78,7 +87,7 @@
         }
 
         .top-bar {
-            background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px;
+            background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
         }
@@ -246,7 +255,6 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
-        // УНИВЕРСАЛЬНОЕ ОТСЛЕЖИВАНИЕ КУРСОРА (ПК + МОБИЛКИ)
         const updatePos = (e) => {
             cursor.style.opacity = '1';
             let ev = e.touches ? e.touches[0] : e;
