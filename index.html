@@ -36,17 +36,22 @@
 
         #marquee-text { white-space: nowrap; will-change: transform; }
 
+        /* ИСПРАВЛЕНО: Заголовок теперь изначально слева */
         .title-wrapper {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            width: 100%; transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
+            display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+            position: absolute; 
+            left: 20px; /* Фиксация слева */
+            top: 50%; 
+            transform: translateY(-50%);
+            width: auto; 
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        /* 3. Логика изменения размера заголовка */
         h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; transition: font-size 0.8s ease; }
         
-        .title-wrapper.moved { top: 40px; left: 20px; transform: translate(0, 0); justify-content: flex-start; width: auto; }
-        .title-wrapper.moved h1 { font-size: 24px; } /* Увеличивается до нужного размера на месте */
+        /* ИСПРАВЛЕНО: Плавный подъем наверх без смещения по горизонтали */
+        .title-wrapper.moved { top: 40px; transform: translateY(0); }
+        .title-wrapper.moved h1 { font-size: 24px; }
 
         .title-flag { height: 22px; width: auto; opacity: 0; transition: opacity 0.8s ease-in-out; transition-delay: 1s; }
         .title-wrapper.moved .title-flag { opacity: 1; }
@@ -60,11 +65,9 @@
         @media (min-width: 500px) {
             body { align-items: center; }
             .content-fade { align-self: center; }
-            .title-wrapper.moved { left: calc(50% - 230px); } 
-        }
-        @media (max-width: 500px) {
-            .title-wrapper.moved { left: 20px; }
-            .content-fade { margin-top: 55px; }
+            /* Центрируем блок на ПК, сохраняя левое выравнивание внутри */
+            .title-wrapper { left: calc(50% - 230px); } 
+            @media (max-width: 500px) { .title-wrapper { left: 20px; } }
         }
 
         .content-fade.visible { opacity: 1; visibility: visible; }
@@ -80,10 +83,9 @@
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
-        /* 1. Нижние кнопки по сторонам */
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 500px; /* Чтобы кнопки не улетали слишком далеко на ПК */
+            width: 100%; max-width: 500px;
             padding: 15px 20px; display: flex; justify-content: space-between;
             align-items: flex-end; z-index: 200;
         }
@@ -120,10 +122,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -203,7 +205,6 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                // 2. Увеличена скорость бегущей строки (было 1.5, стало 3.0)
                 marqueePos -= 3.0;
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
@@ -232,4 +233,3 @@
     </script>
 </body>
 </html>
-
