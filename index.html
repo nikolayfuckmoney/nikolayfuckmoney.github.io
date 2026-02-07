@@ -42,20 +42,13 @@
             transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        .title-wrapper.moved { 
-            top: 40px; 
-            left: 20px; 
-            transform: translate(0, 0); 
-        }
+        .title-wrapper.moved { top: 40px; left: 20px; transform: translate(0, 0); }
 
         h1 { font-size: 24px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; }
 
-        /* Плавное появление флага с задержкой */
         .title-flag { 
-            height: 22px; width: auto; 
-            opacity: 0; 
-            transition: opacity 0.8s ease-in-out; 
-            transition-delay: 1s; /* Появится после того, как текст встанет на место */
+            height: 22px; width: auto; opacity: 0; 
+            transition: opacity 0.8s ease-in-out; transition-delay: 1s; 
         }
         .title-wrapper.moved .title-flag { opacity: 1; }
 
@@ -85,7 +78,6 @@
         }
         .link-text:hover { color: #666; }
 
-        /* Карусель чуть побольше (280px вместо 250px) */
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; font-size: 0; }
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
@@ -134,7 +126,8 @@
         <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
         <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
         <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
-        <a href="https://discord.com" class="link-text interactive" target="_blank">discord: @dnka</a>
+        <!-- Кнопка Discord с копированием -->
+        <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
@@ -161,6 +154,7 @@
         const muteBtn = document.getElementById('mute-btn-el');
         const gallery = document.getElementById('gallery-anim');
         const marqueeEl = document.getElementById('marquee-text');
+        const discordBtn = document.getElementById('discord-btn');
 
         document.addEventListener('mousemove', e => {
             cursor.style.left = e.clientX + 'px';
@@ -170,6 +164,17 @@
         document.querySelectorAll('.interactive').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+        });
+
+        // Копирование Discord
+        discordBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText('dnka').then(() => {
+                const originalText = discordBtn.innerText;
+                discordBtn.innerText = 'COPIED!';
+                setTimeout(() => {
+                    discordBtn.innerText = originalText;
+                }, 2000);
+            });
         });
 
         const textToType = "HELLO, IM DNKA!";
