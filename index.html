@@ -16,17 +16,25 @@
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
-            --gallery-filter: grayscale(100%);
         }
 
+        /* ЭФФЕКТЫ НОЧНОГО ВИДЕНИЯ */
         body.custom-mode {
-            --bg-color: #0a0a0a;
+            --bg-color: #050a05;
             --main-color: #39FF14; 
             --bg-image: url('r4.6.png'); 
-            --gallery-filter: sepia(100%) hue-rotate(70deg) brightness(1.2) saturate(1.5);
-            /* Эффект затемнения и полосок поверх твоего фото r4.6.png */
-            --overlay: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%), 
-                       repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+            --gallery-filter: sepia(100%) hue-rotate(70deg) brightness(1.2) saturate(1.5) contrast(1.2);
+            /* Виньетка, шум и зеленый градиент */
+            --overlay: 
+                radial-gradient(circle, transparent 30%, rgba(0,20,0,0.6) 80%, rgba(0,0,0,0.95) 100%),
+                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.05) 0px, rgba(57, 255, 20, 0.05) 1px, transparent 2px, transparent 4px);
+            animation: nv-flicker 0.15s infinite;
+        }
+
+        @keyframes nv-flicker {
+            0% { opacity: 0.98; }
+            50% { opacity: 1; }
+            100% { opacity: 0.99; }
         }
 
         * { 
@@ -35,7 +43,6 @@
             letter-spacing: -1.2px; 
             -webkit-user-select: none; 
             user-select: none; 
-            -webkit-touch-callout: none;
             touch-action: none; 
         }
 
@@ -52,16 +59,15 @@
             background-size: cover;
             background-position: center;
             color: var(--main-color);
-            margin: 0; padding: 0; height: 100vh; width: 100vw;
-            overflow: hidden; display: flex; flex-direction: column; 
-            align-items: center;
-            transition: background 0.5s ease, color 0.5s ease;
+            margin: 0; height: 100vh; width: 100vw;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
             position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 999999 !important; 
+            pointer-events: none; z-index: 999999; 
             mix-blend-mode: difference;
             background: #fff; opacity: 0;
             will-change: transform;
@@ -71,68 +77,51 @@
         .top-bar {
             background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px; 
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 100;
-            overflow: hidden;
+            opacity: 0; transition: 0.5s; z-index: 100; overflow: hidden;
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
 
         .title-wrapper {
-            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
-            width: auto; transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1), top 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
+            display: flex; flex-direction: column; position: absolute; left: 20px; top: 50%; 
+            transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
         
-        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; color: var(--main-color); transition: font-size 0.8s ease; }
-        
-        .location-text {
-            font-size: 9.5px; 
-            text-transform: uppercase; 
-            margin-top: 1px; 
-            opacity: 0; 
-            transition: opacity 0.5s ease;
-        }
-
+        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; color: var(--main-color); transition: 0.8s; }
+        .location-text { font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; transition: 0.5s; }
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; transition-delay: 1s; }
 
         .content-fade { 
-            opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
+            opacity: 0; visibility: hidden; transition: 0.8s; 
             padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
-            display: flex; flex-direction: column; align-self: flex-start;
+            display: flex; flex-direction: column;
         }
-
         .content-fade.visible { opacity: 1; visibility: visible; }
 
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
-            border-bottom: 1px solid var(--main-color); transition: color 0.5s, border-bottom 0.5s;
+            border-bottom: 1px solid var(--main-color); transition: 0.5s;
         }
 
-        .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; font-size: 0; }
-        .gallery { 
-            display: flex; width: max-content; will-change: transform; 
-            filter: var(--gallery-filter);
-            transition: filter 0.5s ease;
-        }
-        .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
+        .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
+        .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: 0.5s; }
+        .gallery img { width: 280px; height: auto; }
 
-        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 0; transition: color 0.5s; }
+        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 500px;
-            padding: 15px 20px; display: flex; justify-content: space-between;
-            align-items: flex-end; z-index: 200;
+            width: 100%; max-width: 500px; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
         }
 
         .bottom-btn {
             background: var(--main-color); color: var(--bg-color); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
-            text-transform: uppercase; transition: background 0.5s, color 0.5s;
-            touch-action: none;
+            text-transform: uppercase; transition: 0.5s;
         }
 
         .tooltip-wrapper { position: relative; }
@@ -146,7 +135,6 @@
         #sound-tooltip { right: 0; }
 
         @media (min-width: 500px) {
-            body { align-items: center; }
             .content-fade { align-self: center; }
             .title-wrapper { left: calc(50% - 230px); } 
         }
@@ -157,7 +145,7 @@
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
-    <div class="top-bar interactive" id="top-bar">
+    <div class="top-bar" id="top-bar">
         <div id="marquee-text">ALL BUTTONS CLICKABLE  /  [ HOLD  TO  STOP  TEXT ]</div>
     </div>
 
@@ -167,11 +155,11 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
-        <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
+        <a href="https://instagram.com" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text" target="_blank">tiktok: @dnkanle</a>
+        <a href="javascript:void(0)" class="link-text" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
@@ -184,13 +172,13 @@
 
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
-            <button class="bottom-btn interactive">[ ABOUT ME ]</button>
+            <button class="bottom-btn">[ ABOUT ME ]</button>
             <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="bottom-btn interactive" id="mode-btn">[ MODE: LIGHT ]</button>
+            <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
             <div class="tooltip-wrapper">
-                <button class="bottom-btn interactive" id="mute-btn-el">[ SOUND: OFF ]</button>
+                <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
                 <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
             </div>
         </div>
@@ -215,8 +203,7 @@
 
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0;
-        let marqueeCurrentSpeed = 2.0;
-        let marqueeTargetSpeed = 2.0;
+        let marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
@@ -234,10 +221,15 @@
             }
         }
 
+        // ЛОГИКА ЗАЖАТИЯ (ВКЛ/ВЫКЛ Custom)
         const handleStart = (e) => {
             pressTimer = setTimeout(() => {
-                document.body.classList.add('custom-mode');
-                document.body.classList.remove('dark-mode');
+                const isCustomNow = document.body.classList.toggle('custom-mode');
+                if (isCustomNow) {
+                    document.body.classList.remove('dark-mode');
+                } else {
+                    document.body.classList.toggle('dark-mode', isDarkMode);
+                }
                 setModeText();
                 updateMusic();
                 pressTimer = null;
@@ -247,11 +239,7 @@
         const handleEnd = (e) => {
             if (pressTimer) {
                 clearTimeout(pressTimer);
-                if (document.body.classList.contains('custom-mode')) {
-                    document.body.classList.remove('custom-mode');
-                    // Возвращаемся к текущему режиму (светлый/темный)
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                } else {
+                if (!document.body.classList.contains('custom-mode')) {
                     isDarkMode = !isDarkMode;
                     document.body.classList.toggle('dark-mode', isDarkMode);
                 }
@@ -270,14 +258,12 @@
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
             const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
-            mouseX = touch.clientX;
-            mouseY = touch.clientY;
+            mouseX = touch.clientX; mouseY = touch.clientY;
         };
 
         window.addEventListener('mousemove', updateCursorPos, { passive: true });
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
-        document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -321,7 +307,6 @@
 
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed; 
-                
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
                     currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
@@ -334,16 +319,12 @@
 
         muteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
-            const isCustom = document.body.classList.contains('custom-mode');
-            const currentAudio = isCustom ? audioCustom : audioDefault;
+            const currentAudio = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
             if (!isMuted) { currentAudio.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetSpeed = 1.2; } 
             else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetSpeed = 0; }
         });
 
-        window.onload = () => {
-            typeView();
-            loop();
-        };
+        window.onload = () => { typeView(); loop(); };
     </script>
 </body>
 </html>
