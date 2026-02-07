@@ -14,7 +14,6 @@
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
-            --bg-image: none;
         }
 
         body.custom-mode {
@@ -26,9 +25,10 @@
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
-            letter-spacing: -0.8px; 
+            letter-spacing: -1.2px; /* Из старого кода */
             -webkit-user-select: none; 
             user-select: none; 
+            -webkit-touch-callout: none;
             touch-action: none; 
         }
 
@@ -61,18 +61,18 @@
             transition: opacity 0.3s ease;
         }
 
+        /* Стиль бара из старого кода */
         .top-bar {
             background: var(--main-color); 
             color: var(--bg-color); 
             font-size: 10px; 
-            height: calc(22px + env(safe-area-inset-top)); 
-            padding-top: env(safe-area-inset-top);
+            height: 22px; 
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 100;
             overflow: hidden;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; flex: 1; }
+        #marquee-text { white-space: nowrap; will-change: transform; }
 
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
@@ -81,12 +81,12 @@
         }
         
         h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; color: var(--main-color); transition: font-size 0.8s ease; }
-        .title-wrapper.moved { top: calc(55px + env(safe-area-inset-top)); transform: translateY(0); }
+        .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
 
         .content-fade { 
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
-            padding: 20px; margin-top: calc(85px + env(safe-area-inset-top)); width: 100%; max-width: 500px;
+            padding: 20px; margin-top: 65px; width: 100%; max-width: 500px;
             display: flex; flex-direction: column; align-self: flex-start;
         }
 
@@ -104,14 +104,14 @@
 
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
-            margin-top: 0; /* Максимально близко к карусели */
+            margin-top: 0; 
             transition: color 0.5s; 
         }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px;
-            padding: calc(15px + env(safe-area-inset-bottom)) 20px; 
+            padding: 15px 20px; 
             display: flex; justify-content: space-between;
             align-items: flex-end; z-index: 200;
         }
@@ -199,7 +199,7 @@
         let animationsStarted = false;
 
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
-        let phraseIndex = 0;
+        let currentPhraseIdx = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
@@ -248,7 +248,7 @@
 
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
-            const touch = (e.touches && e.touches.length > 0) ? e.touches : e;
+            const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
             mouseX = touch.clientX;
             mouseY = touch.clientY;
         };
@@ -299,11 +299,12 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                marqueePos -= 2.0; 
-                if (marqueePos < -marqueeEl.offsetWidth - 20) {
+                // Поочередная строка из старого кода
+                marqueePos -= 3.0; 
+                if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
-                    phraseIndex = (phraseIndex + 1) % phrases.length;
-                    marqueeEl.innerText = phrases[phraseIndex];
+                    currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
+                    marqueeEl.innerText = phrases[currentPhraseIdx];
                 }
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
             }
@@ -314,7 +315,7 @@
             isMuted = !isMuted;
             const isCustom = document.body.classList.contains('custom-mode');
             const currentAudio = isCustom ? audioCustom : audioDefault;
-            if (!isMuted) { currentAudio.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetSpeed = 0.8; } 
+            if (!isMuted) { currentAudio.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetSpeed = 1.2; } 
             else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetSpeed = 0; }
         });
 
