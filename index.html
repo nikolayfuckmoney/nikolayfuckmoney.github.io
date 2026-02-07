@@ -12,48 +12,35 @@
             --gallery-filter: grayscale(100%);
             --bg-filter: none;
             --overlay: none;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
         }
 
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
         }
 
-        /* КИСЛОТНЫЙ ЭФФЕКТ ДЛЯ ФОНА И МЯГКИЙ ДЛЯ КАРУСЕЛИ */
         body.custom-mode {
             --bg-color: #050a05;
-            --main-color: #39FF14;
+            --main-color: #000000;
             --bg-image: url('r4.6.png');
-            
-            /* МЯГКИЙ ЗЕЛЕНЫЙ ЭФФЕКТ ДЛЯ КАРУСЕЛИ */
-            --gallery-filter: sepia(1) hue-rotate(90deg) saturate(2) brightness(0.9); 
-            
+            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(0.9) saturate(7) contrast(1.5); 
             --bg-filter: sepia(100%) hue-rotate(85deg) brightness(0.9) saturate(7) contrast(1.5);
-            
+            --btn-bg: #000000;
+            --btn-text: #39FF14;
             background-blend-mode: color;
             background-color: rgba(0, 255, 0, 0.5);
-
-            --overlay:
-                radial-gradient(circle, transparent 20%, rgba(0,15,0,0.6) 75%, rgba(0,0,0,0.95) 100%),
-                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.12) 0px, rgba(57, 255, 20, 0.12) 1px, transparent 2px, transparent 4px);
-
+            --overlay: radial-gradient(circle, transparent 20%, rgba(0,15,0,0.6) 75%, rgba(0,0,0,0.95) 100%),
+                       repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.12) 0px, rgba(57, 255, 20, 0.12) 1px, transparent 2px, transparent 4px);
             animation: nv-flicker 0.1s infinite;
         }
 
-        @keyframes nv-flicker {
-            0% { opacity: 0.97; }
-            50% { opacity: 1; }
-            100% { opacity: 0.98; }
-        }
+        @keyframes nv-flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
 
-        * {
-            cursor: none !important;
-            box-sizing: border-box;
-            letter-spacing: -1.2px;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: none;
-        }
+        * { cursor: none !important; box-sizing: border-box; letter-spacing: -1.2px; -webkit-user-select: none; user-select: none; touch-action: none; }
 
         @font-face {
             font-family: 'Bookish Book';
@@ -80,16 +67,14 @@
             position: fixed; top: 0; left: 0;
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #fff; 
-            opacity: 0;
-            will-change: transform, opacity;
+            background: #fff; opacity: 0;
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .top-bar {
             background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: 0.5s; z-index: 100; overflow: hidden;
+            opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
@@ -99,11 +84,20 @@
             transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
 
-        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; color: var(--main-color); transition: 0.8s; }
-        .location-text { font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; transition: 0.5s; }
+        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease; }
+        
+        .location-text { 
+            font-size: 9.5px; 
+            text-transform: uppercase; 
+            margin-top: 1px; 
+            opacity: 0; 
+            color: var(--main-color); 
+            transition: color 0.4s ease, opacity 0.5s ease; /* Убрана задержка, добавлен переход цвета */
+        }
+        
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
-        .title-wrapper.moved .location-text { opacity: 1; transition-delay: 1s; }
+        .title-wrapper.moved .location-text { opacity: 1; } /* Задержка появления удалена для быстроты смены темы */
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
@@ -115,19 +109,14 @@
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
-            border-bottom: 1px solid var(--main-color); transition: 0.5s;
+            border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
-        .gallery { 
-            display: flex; 
-            width: max-content; 
-            filter: var(--gallery-filter);
-            transition: filter 0.5s ease; 
-        }
+        .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease; }
         .gallery img { width: 280px; height: auto; }
 
-        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; }
+        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; transition: 0.4s ease; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -136,15 +125,15 @@
         }
 
         .bottom-btn {
-            background: var(--main-color); color: var(--bg-color); border: none; padding: 8px 12px;
+            background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
-            text-transform: uppercase; transition: 0.5s;
+            text-transform: uppercase; transition: 0.4s ease;
         }
 
         .tooltip-wrapper { position: relative; }
         .tooltip-content {
             display: none; position: absolute; bottom: calc(100% + 8px);
-            background: var(--main-color); color: var(--bg-color); padding: 10px; font-size: 9px;
+            background: var(--btn-bg); color: var(--btn-text); padding: 10px; font-size: 9px;
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
@@ -161,7 +150,7 @@
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE   /   [ HOLD   TO   STOP   TEXT  ]</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE  /  [ HOLD  TO  STOP  TEXT ]</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -213,21 +202,18 @@
 
         let isDarkMode = false, isMuted = true, pressTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let cursorX = mouseX, cursorY = mouseY;
-        let animationsStarted = false;
+        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
-        let currentPhraseIdx = 0;
-        let marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
-        let galleryPos = 0;
-        let targetSpeed = 0;
+        let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
             soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
-            if (isCustom) { audioDefault.pause(); audioCustom.play(); }
-            else { audioCustom.pause(); audioDefault.play(); }
+            const cur = isCustom ? audioCustom : audioDefault;
+            const other = isCustom ? audioDefault : audioCustom;
+            other.pause(); cur.play();
         }
 
         function setModeText() {
@@ -238,7 +224,7 @@
             }
         }
 
-        const handleStart = (e) => {
+        const handleStart = () => {
             pressTimer = setTimeout(() => {
                 const active = document.body.classList.toggle('custom-mode');
                 if (active) document.body.classList.remove('dark-mode');
@@ -248,7 +234,7 @@
             }, 800);
         };
 
-        const handleEnd = (e) => {
+        const handleEnd = () => {
             if (pressTimer) {
                 clearTimeout(pressTimer);
                 if (!document.body.classList.contains('custom-mode')) {
@@ -275,7 +261,6 @@
         window.addEventListener('mousemove', updateCursorPos, { passive: true });
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
-
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
         window.addEventListener('blur', () => cursor.style.opacity = '0');
@@ -306,7 +291,6 @@
         }
 
         let marqueePos = window.innerWidth;
-
         function loop() {
             cursorX += (mouseX - cursorX) * 0.25;
             cursorY += (mouseY - cursorY) * 0.25;
