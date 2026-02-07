@@ -53,13 +53,14 @@
 
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
-            position: fixed; pointer-events: none; 
+            position: fixed; 
+            top: 0; left: 0; /* Базовое положение в углу */
+            pointer-events: none; 
             z-index: 999999 !important; 
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
             will-change: transform;
-            /* Убрали CSS transition для координат, чтобы не было рваности */
             transition: opacity 0.5s ease;
         }
 
@@ -67,7 +68,6 @@
             background: var(--main-color); 
             color: var(--bg-color); 
             font-size: 10px; 
-            /* Добавили учет челки для сплошного цвета */
             height: calc(22px + env(safe-area-inset-top)); 
             padding-top: env(safe-area-inset-top);
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
@@ -194,7 +194,9 @@
         const soundTooltip = document.getElementById('sound-tooltip');
 
         let isDarkMode = false, isMuted = true, pressTimer;
-        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let cursorX = mouseX, cursorY = mouseY;
+        let animationsStarted = false;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
@@ -230,16 +232,20 @@
             }
         }
 
-        // ЛОГИКА КУРСОРA (БЕЗ РВАННОСТИ)
+        // КУРСОР: Исправленный трекинг
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
-            const touch = e.touches ? e.touches[0] : e;
-            mouseX = touch.clientX;
-            mouseY = touch.clientY;
+            if (e.touches && e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            } else {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
         };
 
-        window.addEventListener('mousemove', updateCursorPos);
-        window.addEventListener('touchstart', updateCursorPos);
+        window.addEventListener('mousemove', updateCursorPos, { passive: true });
+        window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
 
         discordBtn.addEventListener('click', () => {
@@ -263,7 +269,7 @@
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
                         document.getElementById('top-bar').style.opacity = '1';
-                        startAnimations();
+                        animationsStarted = true;
                     }, 1000);
                 }, 800);
             }
@@ -271,13 +277,13 @@
 
         let currentSpeed = 0, targetSpeed = 0, galleryPos = 0, marqueePos = window.innerWidth;
 
-        function startAnimations() {
-            function animate() {
-                // Плавный курсор через интерполяцию
-                cursorX += (mouseX - cursorX) * 0.2;
-                cursorY += (mouseY - cursorY) * 0.2;
-                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+        function loop() {
+            // Курсор работает ВСЕГДА и по всему экрану
+            cursorX += (mouseX - cursorX) * 0.25;
+            cursorY += (mouseY - cursorY) * 0.25;
+            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
+            if (animationsStarted) {
                 // Галерея
                 currentSpeed += (targetSpeed - currentSpeed) * 0.05;
                 galleryPos -= currentSpeed;
@@ -288,10 +294,9 @@
                 marqueePos -= 1.5; 
                 if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
-
-                requestAnimationFrame(animate);
             }
-            animate();
+
+            requestAnimationFrame(loop);
         }
 
         muteBtn.addEventListener('click', () => {
@@ -302,7 +307,10 @@
             else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetSpeed = 0; }
         });
 
-        window.onload = typeView;
+        window.onload = () => {
+            typeView();
+            loop(); // Запуск цикла отрисовки сразу
+        };
     </script>
 </body>
 </html>
