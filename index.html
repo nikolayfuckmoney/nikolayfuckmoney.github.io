@@ -17,7 +17,6 @@
             --bg-image: none;
         }
 
-        /* Кастомная тема: Ядовито-зеленый неон */
         body.custom-mode {
             --bg-color: #0a0a0a;
             --main-color: #39FF14; 
@@ -127,13 +126,17 @@
 
         .tooltip-wrapper { position: relative; }
 
+        /* Специальный класс для кнопки в кастом теме */
+        #custom-theme-btn { display: none; }
+        body.custom-mode #custom-theme-btn { display: block; margin-right: 10px; }
+
         .tooltip-content {
             display: none; position: absolute; bottom: calc(100% + 8px);
             background: var(--main-color); color: var(--bg-color); padding: 10px; font-size: 9px;
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
-        #about-tooltip { left: 0; }
+        #about-tooltip, #custom-tooltip { left: 0; }
         #sound-tooltip { right: 0; }
 
         @media (min-width: 500px) {
@@ -151,6 +154,7 @@
 <body>
     <div id="custom-cursor"></div>
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
         <div id="marquee-text" style="padding-left: 20px;">ALL BUTTONS CLICKABLE</div>
@@ -178,10 +182,19 @@
     </div>
 
     <div class="bottom-bar">
-        <div class="tooltip-wrapper">
-            <button class="bottom-btn interactive">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
+        <div style="display: flex;">
+            <!-- Новая кнопка специально для CUSTOM темы -->
+            <div class="tooltip-wrapper" id="custom-theme-btn">
+                <button class="bottom-btn interactive">[ 123 ]</button>
+                <div class="tooltip-content" id="custom-tooltip">123</div>
+            </div>
+            
+            <div class="tooltip-wrapper">
+                <button class="bottom-btn interactive">[ ABOUT ME ]</button>
+                <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
+            </div>
         </div>
+
         <div style="display: flex; gap: 10px;">
             <button class="bottom-btn interactive" id="mode-btn">[ MODE: LIGHT ]</button>
             <div class="tooltip-wrapper">
@@ -193,7 +206,8 @@
 
     <script>
         const cursor = document.getElementById('custom-cursor');
-        const audio = document.getElementById('bg-music');
+        const audioDefault = document.getElementById('bg-music');
+        const audioCustom = document.getElementById('custom-music');
         const muteBtn = document.getElementById('mute-btn-el');
         const modeBtn = document.getElementById('mode-btn');
         const gallery = document.getElementById('gallery-anim');
@@ -202,14 +216,27 @@
 
         let isDarkMode = false;
         let pressTimer;
+        let isMuted = true;
 
-        // Логика переключения тем (Клик / Зажатие)
+        function updateMusic() {
+            if (isMuted) return;
+            const isCustom = document.body.classList.contains('custom-mode');
+            if (isCustom) {
+                audioDefault.pause();
+                audioCustom.play();
+            } else {
+                audioCustom.pause();
+                audioDefault.play();
+            }
+        }
+
         modeBtn.addEventListener('mousedown', () => {
             pressTimer = setTimeout(() => {
                 document.body.classList.remove('dark-mode');
                 document.body.classList.toggle('custom-mode');
                 const isCustom = document.body.classList.contains('custom-mode');
                 modeBtn.innerText = isCustom ? "[ MODE: CUSTOM ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
                 pressTimer = null;
             }, 1000); 
         });
@@ -224,7 +251,6 @@
             }
         });
 
-        // Поддержка мобильных устройств
         modeBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             pressTimer = setTimeout(() => {
@@ -232,6 +258,7 @@
                 document.body.classList.toggle('custom-mode');
                 const isCustom = document.body.classList.contains('custom-mode');
                 modeBtn.innerText = isCustom ? "[ MODE: CUSTOM ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
                 pressTimer = null;
             }, 1000);
         });
@@ -255,9 +282,15 @@
 
         const updateCursorPos = (e) => {
             const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
-            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
+            const x = isTouch ? (e.touches ? e.touches.clientX : null) : e.clientX;
+            const y = isTouch ? (e.touches ? e.touches.clientY : null) : e.clientY;
+
             if (x !== null && y !== null) {
+                if (e.type === 'touchstart') {
+                    cursor.style.transition = 'left 0.6s cubic-bezier(0.25, 1, 0.5, 1), top 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s';
+                } else {
+                    cursor.style.transition = 'opacity 0.5s';
+                }
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
@@ -309,7 +342,7 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                marqueePos -= 1.5; // Замедленный текст (было 3.0)
+                marqueePos -= 1.5; 
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
                     currentPhraseIdx = (currentPhraseIdx + 1) % marqueePhrases.length;
@@ -322,12 +355,17 @@
         }
 
         muteBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
+            isMuted = !isMuted;
+            const isCustom = document.body.classList.contains('custom-mode');
+            const currentAudio = isCustom ? audioCustom : audioDefault;
+
+            if (!isMuted) {
+                currentAudio.play();
                 muteBtn.innerText = "[ SOUND: ON ]";
-                targetSpeed = 0.8; // Замедленная галерея (было 1.2)
+                targetSpeed = 0.8;
             } else {
-                audio.pause();
+                audioDefault.pause();
+                audioCustom.pause();
                 muteBtn.innerText = "[ SOUND: OFF ]";
                 targetSpeed = 0;
             }
