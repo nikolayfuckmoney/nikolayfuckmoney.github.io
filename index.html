@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka links</title>
     <style>
+        /* Переменные для быстрой смены темы */
+        :root {
+            --bg-color: #ffffff;
+            --main-color: #000000;
+            --cursor-bg: #fff;
+        }
+
+        /* Темная тема */
+        body.dark-mode {
+            --bg-color: #000000;
+            --main-color: #ffffff;
+            --cursor-bg: #000;
+        }
+
         * { cursor: none !important; box-sizing: border-box; }
 
         @font-face {
@@ -15,10 +29,11 @@
 
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background: #ffffff; color: #000000;
+            background: var(--bg-color); color: var(--main-color);
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center; letter-spacing: -0.5px;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         #custom-cursor {
@@ -27,17 +42,16 @@
             z-index: 999999 !important; 
             transform: translate(-50%, -50%);
             mix-blend-mode: difference;
-            background: #fff;
+            background: #fff; /* Всегда белый, чтобы на разном фоне через difference давать инверсию */
             opacity: 0;
-            /* Начальный transition для появления */
             transition: width 0.2s, height 0.2s, opacity 0.5s ease;
         }
         .cursor-hover { width: 12px !important; height: 12px !important; }
 
         .top-bar {
-            background: #000; color: #fff; font-size: 10px; height: 22px;
+            background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: opacity 0.8s ease; z-index: 50;
+            opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 50;
             overflow: hidden;
         }
 
@@ -68,18 +82,18 @@
 
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
-            color: #000; text-decoration: none; margin-bottom: 5px; padding: 8px 0;
-            border-bottom: 1px solid #000; transition: color 0.3s;
+            color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
+            border-bottom: 1px solid var(--main-color); transition: color 0.3s, border-bottom 0.5s;
         }
-        .link-text:hover { color: #666; }
+        .link-text:hover { opacity: 0.6; }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; font-size: 0; }
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
         .copyright {
-            font-size: 8px; text-transform: uppercase; color: #000;
-            margin-top: 15px; letter-spacing: 1px;
+            font-size: 8px; text-transform: uppercase; color: var(--main-color);
+            margin-top: 15px; letter-spacing: 1px; transition: color 0.5s;
         }
 
         .bottom-bar {
@@ -90,16 +104,16 @@
         }
 
         .bottom-btn {
-            background: #000; color: #fff; border: none; padding: 8px 12px;
+            background: var(--main-color); color: var(--bg-color); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
-            text-transform: uppercase; transition: opacity 0.3s;
+            text-transform: uppercase; transition: opacity 0.3s, background 0.5s, color 0.5s;
         }
         .bottom-btn:hover { opacity: 0.7; }
 
         .tooltip-wrapper { position: relative; }
         .tooltip-content {
             display: none; position: absolute; bottom: calc(100% + 8px);
-            background: #000; color: #fff; padding: 10px; font-size: 9px;
+            background: var(--main-color); color: var(--bg-color); padding: 10px; font-size: 9px;
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
@@ -114,6 +128,7 @@
         @media (max-width: 500px) {
             .title-wrapper { left: 20px; }
             .content-fade { margin-top: 55px; }
+            .bottom-bar { flex-wrap: wrap; gap: 10px; }
         }
     </style>
 </head>
@@ -152,9 +167,12 @@
             <button class="bottom-btn interactive">[ ABOUT ME ]</button>
             <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
         </div>
-        <div class="tooltip-wrapper">
-            <button class="bottom-btn interactive" id="mute-btn-el">[ SOUND: OFF ]</button>
-            <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
+        <div style="display: flex; gap: 10px;">
+            <button class="bottom-btn interactive" id="mode-btn">[ MODE: LIGHT ]</button>
+            <div class="tooltip-wrapper">
+                <button class="bottom-btn interactive" id="mute-btn-el">[ SOUND: OFF ]</button>
+                <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
+            </div>
         </div>
     </div>
 
@@ -162,11 +180,18 @@
         const cursor = document.getElementById('custom-cursor');
         const audio = document.getElementById('bg-music');
         const muteBtn = document.getElementById('mute-btn-el');
+        const modeBtn = document.getElementById('mode-btn');
         const gallery = document.getElementById('gallery-anim');
         const marqueeEl = document.getElementById('marquee-text');
         const discordBtn = document.getElementById('discord-btn');
 
-        // Появление курсора при первом взаимодействии
+        // Смена темы
+        modeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            modeBtn.innerText = isDark ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+        });
+
         const showCursor = (e) => {
             cursor.style.opacity = '1';
             updateCursorPos(e);
@@ -175,20 +200,9 @@
         };
 
         const updateCursorPos = (e) => {
-            const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? e.touches[0].clientX : e.clientX;
-            const y = isTouch ? e.touches[0].clientY : e.clientY;
-
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
             if (x && y) {
-                // Если это тап (touchstart), включаем плавное подплывание
-                if (e.type === 'touchstart') {
-                    cursor.style.transition = 'left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s, height 0.2s, opacity 0.5s';
-                } 
-                // Если ведем или мышь — убираем transition перемещения для резкого отклика
-                else {
-                    cursor.style.transition = 'width 0.2s, height 0.2s, opacity 0.5s';
-                }
-
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
@@ -197,7 +211,6 @@
         window.addEventListener('mousemove', showCursor);
         window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
-        window.addEventListener('touchstart', updateCursorPos);
         window.addEventListener('touchmove', updateCursorPos);
 
         document.querySelectorAll('.interactive').forEach(el => {
