@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>dnka links</title>
     <style>
         :root {
@@ -14,7 +14,6 @@
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
-            --bg-image: none;
         }
 
         body.custom-mode {
@@ -23,14 +22,11 @@
             --bg-image: url('r4.6.png');
         }
 
-        /* Запрет выделения текста и зума */
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
             letter-spacing: -0.8px; 
             -webkit-user-select: none; 
-            -moz-user-select: none; 
-            -ms-user-select: none; 
             user-select: none; 
             -webkit-touch-callout: none;
         }
@@ -52,35 +48,34 @@
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
             transition: background 0.5s ease, color 0.5s ease;
-            touch-action: none; /* Полный запрет системных жестов и зума */
+            touch-action: none; 
         }
 
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
             position: fixed; pointer-events: none; 
             z-index: 999999 !important; 
-            transform: translate(-50%, -50%);
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
-            /* Уменьшено время перехода для устранения "рваности" */
-            transition: opacity 0.5s ease, left 0.1s linear, top 0.1s linear;
+            will-change: transform;
+            /* Убрали CSS transition для координат, чтобы не было рваности */
+            transition: opacity 0.5s ease;
         }
 
         .top-bar {
-            background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px;
+            background: var(--main-color); 
+            color: var(--bg-color); 
+            font-size: 10px; 
+            /* Добавили учет челки для сплошного цвета */
+            height: calc(22px + env(safe-area-inset-top)); 
+            padding-top: env(safe-area-inset-top);
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 50;
             overflow: hidden;
-            border-bottom: 1px solid var(--main-color);
         }
 
-        #marquee-text { 
-            white-space: nowrap; 
-            will-change: transform; 
-            flex: 1; 
-            display: block; /* Сплошная линия */
-        }
+        #marquee-text { white-space: nowrap; will-change: transform; flex: 1; }
 
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
@@ -89,22 +84,13 @@
             width: auto; transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1), top 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
         
-        h1 { 
-            font-size: 14px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            margin: 0; 
-            line-height: 1; 
-            color: var(--main-color);
-            transition: font-size 0.8s ease; 
-        }
-        
-        .title-wrapper.moved { top: 40px; transform: translateY(0); }
+        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; color: var(--main-color); transition: font-size 0.8s ease; }
+        .title-wrapper.moved { top: calc(55px + env(safe-area-inset-top)); transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
 
         .content-fade { 
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
-            padding: 20px; margin-top: 65px; width: 100%; max-width: 500px;
+            padding: 20px; margin-top: calc(85px + env(safe-area-inset-top)); width: 100%; max-width: 500px;
             display: flex; flex-direction: column; align-self: flex-start;
         }
 
@@ -120,15 +106,13 @@
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
-        .copyright {
-            font-size: 8px; text-transform: uppercase; color: var(--main-color);
-            margin-top: 15px; transition: color 0.5s;
-        }
+        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 15px; transition: color 0.5s; }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px;
-            padding: 15px 20px; display: flex; justify-content: space-between;
+            padding: calc(15px + env(safe-area-inset-bottom)) 20px; 
+            display: flex; justify-content: space-between;
             align-items: flex-end; z-index: 200;
         }
 
@@ -152,11 +136,6 @@
             body { align-items: center; }
             .content-fade { align-self: center; }
             .title-wrapper { left: calc(50% - 230px); } 
-        }
-        @media (max-width: 500px) {
-            .title-wrapper { left: 20px; }
-            .content-fade { margin-top: 55px; }
-            .bottom-bar { flex-wrap: wrap; gap: 10px; }
         }
     </style>
 </head>
@@ -186,7 +165,6 @@
                 <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
             </div>
         </div>
-        
         <div class="copyright">© 2026 DNKA. ALL RIGHTS RESERVED.</div>
     </div>
 
@@ -195,7 +173,6 @@
             <button class="bottom-btn interactive">[ ABOUT ME ]</button>
             <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
         </div>
-
         <div style="display: flex; gap: 10px;">
             <button class="bottom-btn interactive" id="mode-btn">[ MODE: LIGHT ]</button>
             <div class="tooltip-wrapper">
@@ -216,9 +193,8 @@
         const discordBtn = document.getElementById('discord-btn');
         const soundTooltip = document.getElementById('sound-tooltip');
 
-        let isDarkMode = false;
-        let pressTimer;
-        let isMuted = true;
+        let isDarkMode = false, isMuted = true, pressTimer;
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
@@ -228,7 +204,6 @@
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
-        // Кнопка MODE (Зажатие)
         modeBtn.addEventListener('mousedown', startPress);
         modeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); });
         modeBtn.addEventListener('mouseup', endPress);
@@ -255,32 +230,16 @@
             }
         }
 
-        // КУРСОР: Плавный и точный трекинг
-        const showCursor = (e) => {
-            cursor.style.opacity = '1';
-            updateCursorPos(e);
-            window.removeEventListener('mousemove', showCursor);
-            window.removeEventListener('touchstart', showCursor);
-        };
-
+        // ЛОГИКА КУРСОРA (БЕЗ РВАННОСТИ)
         const updateCursorPos = (e) => {
-            let x, y;
-            if (e.touches && e.touches.length > 0) {
-                x = e.touches[0].clientX;
-                y = e.touches[0].clientY;
-            } else {
-                x = e.clientX;
-                y = e.clientY;
-            }
-            if (x !== undefined && y !== undefined) {
-                cursor.style.left = x + 'px';
-                cursor.style.top = y + 'px';
-            }
+            cursor.style.opacity = '1';
+            const touch = e.touches ? e.touches[0] : e;
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
         };
 
-        window.addEventListener('mousemove', showCursor);
-        window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
+        window.addEventListener('touchstart', updateCursorPos);
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
 
         discordBtn.addEventListener('click', () => {
@@ -310,24 +269,29 @@
             }
         }
 
-        let currentSpeed = 0, targetSpeed = 0, galleryPos = 0;
-        let marqueePos = window.innerWidth;
+        let currentSpeed = 0, targetSpeed = 0, galleryPos = 0, marqueePos = window.innerWidth;
 
         function startAnimations() {
-            function update() {
+            function animate() {
+                // Плавный курсор через интерполяцию
+                cursorX += (mouseX - cursorX) * 0.2;
+                cursorY += (mouseY - cursorY) * 0.2;
+                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+
+                // Галерея
                 currentSpeed += (targetSpeed - currentSpeed) * 0.05;
                 galleryPos -= currentSpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
+                // Бегущая строка
                 marqueePos -= 1.5; 
-                if (marqueePos < -marqueeEl.offsetWidth) {
-                    marqueePos = window.innerWidth;
-                }
+                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
-                requestAnimationFrame(update);
+
+                requestAnimationFrame(animate);
             }
-            update();
+            animate();
         }
 
         muteBtn.addEventListener('click', () => {
