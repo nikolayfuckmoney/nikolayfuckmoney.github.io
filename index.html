@@ -10,6 +10,7 @@
             --main-color: #000000;
             --bg-image: none;
             --gallery-filter: grayscale(100%);
+            --bg-filter: none;
             --overlay: none;
         }
 
@@ -18,17 +19,24 @@
             --main-color: #ffffff;
         }
 
-        /* КИСЛОТНЫЙ РЕЖИМ ПНВ */
+        /* КИСЛОТНЫЙ ЭФФЕКТ ДЛЯ ФОНА И МЯГКИЙ ДЛЯ КАРУСЕЛИ */
         body.custom-mode {
             --bg-color: #050a05;
             --main-color: #39FF14;
             --bg-image: url('r4.6.png');
-            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.1) saturate(8) contrast(1.4);
+            
+            /* МЯГКИЙ ЗЕЛЕНЫЙ ЭФФЕКТ ДЛЯ КАРУСЕЛИ */
+            --gallery-filter: sepia(1) hue-rotate(90deg) saturate(2) brightness(0.9); 
+            
+            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(0.9) saturate(7) contrast(1.5);
+            
             background-blend-mode: color;
-            background-color: rgba(0, 255, 0, 0.45);
+            background-color: rgba(0, 255, 0, 0.5);
+
             --overlay:
                 radial-gradient(circle, transparent 20%, rgba(0,15,0,0.6) 75%, rgba(0,0,0,0.95) 100%),
                 repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.12) 0px, rgba(57, 255, 20, 0.12) 1px, transparent 2px, transparent 4px);
+
             animation: nv-flicker 0.1s infinite;
         }
 
@@ -59,6 +67,8 @@
             background-image: var(--overlay), var(--bg-image);
             background-size: cover;
             background-position: center;
+            backdrop-filter: var(--bg-filter);
+            -webkit-backdrop-filter: var(--bg-filter);
             color: var(--main-color);
             margin: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
@@ -71,9 +81,9 @@
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
             background: #fff; 
-            opacity: 0; /* Изначально скрыт */
+            opacity: 0;
             will-change: transform, opacity;
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Плавное испарение */
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .top-bar {
@@ -109,7 +119,12 @@
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
-        .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: 0.5s; }
+        .gallery { 
+            display: flex; 
+            width: max-content; 
+            filter: var(--gallery-filter);
+            transition: filter 0.5s ease; 
+        }
         .gallery img { width: 280px; height: auto; }
 
         .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; }
@@ -133,8 +148,6 @@
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
-        #about-tooltip { left: 0; }
-        #sound-tooltip { right: 0; }
 
         @media (min-width: 500px) {
             .content-fade { align-self: center; }
@@ -148,7 +161,7 @@
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE  /  [ HOLD  TO  STOP  TEXT ]</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE   /   [ HOLD   TO   STOP   TEXT  ]</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -157,10 +170,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com" class="link-text" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me" class="link-text" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com" class="link-text" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com/ogdnka" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me/eeleve" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv/bananapapa228" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com/@dnkanle" class="link-text" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -253,10 +266,9 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
-        // ЛОГИКА КУРСОРA (Испарение при уходе)
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
-            const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
+            const touch = (e.touches && e.touches.length > 0) ? e.touches : e;
             mouseX = touch.clientX; mouseY = touch.clientY;
         };
 
@@ -264,10 +276,9 @@
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
 
-        // Исчезновение и появление
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
-        window.addEventListener('blur', () => cursor.style.opacity = '0'); // При переключении вкладок
+        window.addEventListener('blur', () => cursor.style.opacity = '0');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
