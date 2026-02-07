@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <!-- Жесткий запрет зума на уровне метатега -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>dnka links</title>
     <style>
@@ -29,8 +30,8 @@
             -webkit-user-select: none; 
             user-select: none; 
             -webkit-touch-callout: none;
-            /* Убирает зум при двойном тапе на большинстве мобильных браузеров */
-            touch-action: manipulation; 
+            /* Запрет системных реакций на тапы */
+            touch-action: none; 
         }
 
         @font-face {
@@ -50,31 +51,28 @@
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
             transition: background 0.5s ease, color 0.5s ease;
-            /* Полный запрет жестов масштабирования */
-            touch-action: none; 
         }
 
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
-            position: fixed; 
-            top: 0; left: 0;
-            pointer-events: none; 
-            z-index: 999999 !important; 
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 999999 !important; 
             mix-blend-mode: difference;
-            background: #fff;
-            opacity: 0;
+            background: #fff; opacity: 0;
             will-change: transform;
-            transition: opacity 0.3s ease; /* Плавное испарение */
+            transition: opacity 0.3s ease;
         }
 
+        /* Единый монолитный блок для верхней панели */
         .top-bar {
             background: var(--main-color); 
             color: var(--bg-color); 
             font-size: 10px; 
+            /* Высота включает в себя зону челки */
             height: calc(22px + env(safe-area-inset-top)); 
             padding-top: env(safe-area-inset-top);
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 50;
+            opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 100;
             overflow: hidden;
         }
 
@@ -82,9 +80,8 @@
 
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
-            position: absolute; 
-            left: 20px; top: 50%; transform: translateY(-50%);
-            width: auto; transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1), top 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            width: auto; transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1), top 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
         
         h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; line-height: 1; color: var(--main-color); transition: font-size 0.8s ease; }
@@ -142,13 +139,13 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
     <div id="custom-cursor"></div>
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE — DM ME FOR ADS/SONG - @EELEVEX (4FREE)</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -156,10 +153,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -201,6 +198,10 @@
         let cursorX = mouseX, cursorY = mouseY;
         let animationsStarted = false;
 
+        // Фразы для поочередного показа
+        const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
+        let phraseIndex = 0;
+
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
             soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
@@ -210,9 +211,9 @@
         }
 
         modeBtn.addEventListener('mousedown', startPress);
-        modeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); });
+        modeBtn.addEventListener('touchstart', (e) => { startPress(); });
         modeBtn.addEventListener('mouseup', endPress);
-        modeBtn.addEventListener('touchend', (e) => { e.preventDefault(); endPress(); });
+        modeBtn.addEventListener('touchend', endPress);
 
         function startPress() {
             pressTimer = setTimeout(() => {
@@ -235,7 +236,6 @@
             }
         }
 
-        // КУРСОР: Трекинг и испарение
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
             const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
@@ -246,8 +246,6 @@
         window.addEventListener('mousemove', updateCursorPos, { passive: true });
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
-
-        // Испарение при выходе за пределы окна
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
 
@@ -291,8 +289,13 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
+                // Логика поочередной бегущей строки
                 marqueePos -= 1.5; 
-                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
+                if (marqueePos < -marqueeEl.offsetWidth) {
+                    marqueePos = window.innerWidth;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    marqueeEl.innerText = phrases[phraseIndex];
+                }
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
             }
             requestAnimationFrame(loop);
