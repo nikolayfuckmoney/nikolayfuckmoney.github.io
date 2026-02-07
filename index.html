@@ -18,32 +18,33 @@
             --main-color: #ffffff;
         }
 
-        /* ЭФФЕКТЫ НОЧНОГО ВИДЕНИЯ */
+        /* КИСЛОТНЫЙ РЕЖИМ ПНВ */
         body.custom-mode {
             --bg-color: #050a05;
-            --main-color: #39FF14; 
-            --bg-image: url('r4.6.png'); 
-            --gallery-filter: sepia(100%) hue-rotate(70deg) brightness(1.2) saturate(1.5) contrast(1.2);
-            /* Виньетка, шум и зеленый градиент */
-            --overlay: 
-                radial-gradient(circle, transparent 30%, rgba(0,20,0,0.6) 80%, rgba(0,0,0,0.95) 100%),
-                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.05) 0px, rgba(57, 255, 20, 0.05) 1px, transparent 2px, transparent 4px);
-            animation: nv-flicker 0.15s infinite;
+            --main-color: #39FF14;
+            --bg-image: url('r4.6.png');
+            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.1) saturate(8) contrast(1.4);
+            background-blend-mode: color;
+            background-color: rgba(0, 255, 0, 0.45);
+            --overlay:
+                radial-gradient(circle, transparent 20%, rgba(0,15,0,0.6) 75%, rgba(0,0,0,0.95) 100%),
+                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.12) 0px, rgba(57, 255, 20, 0.12) 1px, transparent 2px, transparent 4px);
+            animation: nv-flicker 0.1s infinite;
         }
 
         @keyframes nv-flicker {
-            0% { opacity: 0.98; }
+            0% { opacity: 0.97; }
             50% { opacity: 1; }
-            100% { opacity: 0.99; }
+            100% { opacity: 0.98; }
         }
 
-        * { 
-            cursor: none !important; 
-            box-sizing: border-box; 
-            letter-spacing: -1.2px; 
-            -webkit-user-select: none; 
-            user-select: none; 
-            touch-action: none; 
+        * {
+            cursor: none !important;
+            box-sizing: border-box;
+            letter-spacing: -1.2px;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: none;
         }
 
         @font-face {
@@ -67,15 +68,16 @@
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
             position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 999999; 
+            pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #fff; opacity: 0;
-            will-change: transform;
-            transition: opacity 0.3s ease;
+            background: #fff; 
+            opacity: 0; /* Изначально скрыт */
+            will-change: transform, opacity;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Плавное испарение */
         }
 
         .top-bar {
-            background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px; 
+            background: var(--main-color); color: var(--bg-color); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: 0.5s; z-index: 100; overflow: hidden;
         }
@@ -83,18 +85,18 @@
         #marquee-text { white-space: nowrap; will-change: transform; }
 
         .title-wrapper {
-            display: flex; flex-direction: column; position: absolute; left: 20px; top: 50%; 
+            display: flex; flex-direction: column; position: absolute; left: 20px; top: 50%;
             transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
-        
+
         h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; color: var(--main-color); transition: 0.8s; }
         .location-text { font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; transition: 0.5s; }
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; transition-delay: 1s; }
 
-        .content-fade { 
-            opacity: 0; visibility: hidden; transition: 0.8s; 
+        .content-fade {
+            opacity: 0; visibility: hidden; transition: 0.8s;
             padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
             display: flex; flex-direction: column;
         }
@@ -114,7 +116,7 @@
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 500px; padding: 15px 20px; 
+            width: 100%; max-width: 500px; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
         }
 
@@ -136,7 +138,7 @@
 
         @media (min-width: 500px) {
             .content-fade { align-self: center; }
-            .title-wrapper { left: calc(50% - 230px); } 
+            .title-wrapper { left: calc(50% - 230px); }
         }
     </style>
 </head>
@@ -173,7 +175,7 @@
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
             <button class="bottom-btn">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / 11 w2026</div>
         </div>
         <div style="display: flex; gap: 10px;">
             <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
@@ -204,12 +206,14 @@
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0;
         let marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
+        let galleryPos = 0;
+        let targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
             soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
-            if (isCustom) { audioDefault.pause(); audioCustom.play(); } 
+            if (isCustom) { audioDefault.pause(); audioCustom.play(); }
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
@@ -221,19 +225,14 @@
             }
         }
 
-        // ЛОГИКА ЗАЖАТИЯ (ВКЛ/ВЫКЛ Custom)
         const handleStart = (e) => {
             pressTimer = setTimeout(() => {
-                const isCustomNow = document.body.classList.toggle('custom-mode');
-                if (isCustomNow) {
-                    document.body.classList.remove('dark-mode');
-                } else {
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                }
-                setModeText();
-                updateMusic();
+                const active = document.body.classList.toggle('custom-mode');
+                if (active) document.body.classList.remove('dark-mode');
+                else document.body.classList.toggle('dark-mode', isDarkMode);
+                setModeText(); updateMusic();
                 pressTimer = null;
-            }, 800); 
+            }, 800);
         };
 
         const handleEnd = (e) => {
@@ -243,8 +242,7 @@
                     isDarkMode = !isDarkMode;
                     document.body.classList.toggle('dark-mode', isDarkMode);
                 }
-                setModeText();
-                updateMusic();
+                setModeText(); updateMusic();
                 pressTimer = null;
             }
         };
@@ -255,6 +253,7 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
+        // ЛОГИКА КУРСОРA (Испарение при уходе)
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
             const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : e;
@@ -265,20 +264,23 @@
         window.addEventListener('touchstart', updateCursorPos, { passive: true });
         window.addEventListener('touchmove', updateCursorPos, { passive: true });
 
+        // Исчезновение и появление
+        document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+        document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+        window.addEventListener('blur', () => cursor.style.opacity = '0'); // При переключении вкладок
+
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
-                const originalText = discordBtn.innerText;
-                discordBtn.innerText = 'COPIED!';
-                setTimeout(() => discordBtn.innerText = originalText, 2000);
+                const old = discordBtn.innerText; discordBtn.innerText = 'COPIED!';
+                setTimeout(() => discordBtn.innerText = old, 2000);
             });
         });
 
         const textToType = "HELLO, IM DNKA!";
-        let charIndex = 0;
+        let charIdx = 0;
         function typeView() {
-            if (charIndex < textToType.length) {
-                document.getElementById('typewriter-title').textContent += textToType.charAt(charIndex);
-                charIndex++;
+            if (charIdx < textToType.length) {
+                document.getElementById('typewriter-title').textContent += textToType.charAt(charIdx++);
                 setTimeout(typeView, 120);
             } else {
                 setTimeout(() => {
@@ -292,7 +294,7 @@
             }
         }
 
-        let currentSpeed = 0, targetSpeed = 0, galleryPos = 0, marqueePos = window.innerWidth;
+        let marqueePos = window.innerWidth;
 
         function loop() {
             cursorX += (mouseX - cursorX) * 0.25;
@@ -300,13 +302,12 @@
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
             if (animationsStarted) {
-                currentSpeed += (targetSpeed - currentSpeed) * 0.05;
-                galleryPos -= currentSpeed;
+                galleryPos -= targetSpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
-                marqueePos -= marqueeCurrentSpeed; 
+                marqueePos -= marqueeCurrentSpeed;
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
                     currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
@@ -319,8 +320,8 @@
 
         muteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
-            const currentAudio = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
-            if (!isMuted) { currentAudio.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetSpeed = 1.2; } 
+            const cur = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
+            if (!isMuted) { cur.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetSpeed = 1.2; }
             else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetSpeed = 0; }
         });
 
