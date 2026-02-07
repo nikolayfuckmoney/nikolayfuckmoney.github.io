@@ -15,7 +15,11 @@
             --main-color: #ffffff;
         }
 
-        * { cursor: none !important; box-sizing: border-box; }
+        * { 
+            cursor: none !important; 
+            box-sizing: border-box; 
+            letter-spacing: -1.2px; /* Буквы стоят вплотную */
+        }
 
         @font-face {
             font-family: 'Bookish Book';
@@ -28,7 +32,7 @@
             background: var(--bg-color); color: var(--main-color);
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; 
-            align-items: center; letter-spacing: -0.5px;
+            align-items: center;
             transition: background 0.5s ease;
         }
 
@@ -84,7 +88,7 @@
 
         .copyright {
             font-size: 8px; text-transform: uppercase; color: var(--main-color);
-            margin-top: 15px; letter-spacing: 1px; transition: color 0.2s;
+            margin-top: 15px; transition: color 0.2s;
         }
 
         .bottom-bar {
@@ -101,6 +105,7 @@
         }
 
         .tooltip-wrapper { position: relative; }
+
         .tooltip-content {
             display: none; position: absolute; bottom: calc(100% + 8px);
             background: var(--main-color); color: var(--bg-color); padding: 10px; font-size: 9px;
@@ -135,10 +140,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -278,4 +283,3 @@
     </script>
 </body>
 </html>
-
