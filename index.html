@@ -8,11 +8,20 @@
         :root {
             --bg-color: #ffffff;
             --main-color: #000000;
+            --bg-image: none;
         }
 
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
+            --bg-image: none;
+        }
+
+        /* Новая футуристичная тема */
+        body.custom-mode {
+            --bg-color: #0d0d0d;
+            --main-color: #00f2ff; /* Яркий неоновый голубой для видимости */
+            --bg-image: url('r4.6.png');
         }
 
         * { 
@@ -29,11 +38,15 @@
 
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background: var(--bg-color); color: var(--main-color);
+            background-color: var(--bg-color);
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            color: var(--main-color);
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
-            transition: background 0.5s ease;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         #custom-cursor {
@@ -54,10 +67,9 @@
             overflow: hidden;
         }
 
-        /* Кнопка без фона и границ */
         #pause-marquee-btn {
             background: transparent;
-            color: var(--bg-color); /* Использует цвет текста верхней панели */
+            color: var(--bg-color);
             border: none;
             height: 100%;
             padding: 0 12px;
@@ -67,7 +79,7 @@
             justify-content: center;
             cursor: none;
             z-index: 60;
-            opacity: 0.6; /* Сделал чуть прозрачнее для "еле заметного" эффекта */
+            opacity: 0.6;
             transition: opacity 0.3s ease;
         }
         
@@ -106,7 +118,7 @@
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
-            border-bottom: 1px solid var(--main-color); transition: color 0.2s, border-bottom 0.5s;
+            border-bottom: 1px solid var(--main-color); transition: color 0.5s, border-bottom 0.5s;
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; font-size: 0; }
@@ -115,7 +127,7 @@
 
         .copyright {
             font-size: 8px; text-transform: uppercase; color: var(--main-color);
-            margin-top: 15px; transition: color 0.2s;
+            margin-top: 15px; transition: color 0.5s;
         }
 
         .bottom-bar {
@@ -209,11 +221,21 @@
         const pauseMarqueeBtn = document.getElementById('pause-marquee-btn');
 
         let marqueeActive = true;
+        let currentModeIndex = 0; // 0: Light, 1: Dark, 2: Custom
+        const modes = ["LIGHT", "DARK", "CUSTOM"];
 
         modeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            modeBtn.innerText = isDark ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+            currentModeIndex = (currentModeIndex + 1) % modes.length;
+            
+            document.body.classList.remove('dark-mode', 'custom-mode');
+            
+            if (modes[currentModeIndex] === "DARK") {
+                document.body.classList.add('dark-mode');
+            } else if (modes[currentModeIndex] === "CUSTOM") {
+                document.body.classList.add('custom-mode');
+            }
+            
+            modeBtn.innerText = `[ MODE: ${modes[currentModeIndex]} ]`;
         });
 
         pauseMarqueeBtn.addEventListener('click', () => {
@@ -230,8 +252,8 @@
 
         const updateCursorPos = (e) => {
             const isTouch = e.type.startsWith('touch');
-            const x = isTouch ? (e.touches ? e.touches[0].clientX : null) : e.clientX;
-            const y = isTouch ? (e.touches ? e.touches[0].clientY : null) : e.clientY;
+            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
+            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
 
             if (x !== null && y !== null) {
                 if (e.type === 'touchstart') {
