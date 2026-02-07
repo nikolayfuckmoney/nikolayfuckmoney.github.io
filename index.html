@@ -27,16 +27,13 @@
             --top-bar-text: #000000;
         }
 
-        /* КИСЛОТНЫЙ РЕЖИМ (ПНВ) С ОПТИМИЗИРОВАННЫМ КОНТРАСТОМ */
+        /* КИСЛОТНЫЙ РЕЖИМ (ПНВ) */
         body.custom-mode {
             --bg-color: #000000;
-            --main-color: #000000;
+            --main-color: #39FF14; /* Весь текст и ссылки теперь зеленые */
             --bg-image: url('r4.6.png');
-            
-            /* Снижен контраст (с 1.8 до 1.35) и поднята яркость (с 0.8 до 1.0) для видимости деталей */
             --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35); 
-            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35);
-            
+            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(0.8) saturate(5) contrast(1.35);
             --btn-bg: #000000;
             --btn-text: #39FF14;
             --top-bar-bg: #000000;
@@ -143,6 +140,10 @@
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
+
+        /* ИСПРАВЛЕННОЕ ПОЛОЖЕНИЕ ТУЛТИПОВ */
+        #about-tooltip { left: 0; }
+        #sound-tooltip { right: 0; } /* Выводится влево относительно правого края кнопки */
 
         @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
     </style>
