@@ -2,16 +2,17 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dnka links</title>
     <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
     <style>
-        /* Базовые сбросы */
+        /* Базовые настройки */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* Скрываем курсор только на устройствах с мышью */
+        /* Скрываем курсор ТОЛЬКО на десктопах с мышью */
         @media (hover: hover) and (pointer: fine) {
-            * { cursor: none !important; }
+            html, body, a, button, div { cursor: none !important; }
+            #cursor { display: block; }
         }
 
         @font-face {
@@ -35,13 +36,13 @@
 
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* ЭФФЕКТ ЗЕРНА */
+        /* ЗЕРНО */
         .grain {
             position: fixed;
             top: -50%; left: -50%; width: 200%; height: 200%;
             background: url('https://raw.githubusercontent.com');
             pointer-events: none;
-            z-index: 9999;
+            z-index: 9998;
             opacity: 0.04;
             animation: noise 0.2s infinite;
         }
@@ -51,7 +52,7 @@
             100% { transform: translate(5%, -5%); }
         }
 
-        /* КАСТОМНЫЙ КУРСОР */
+        /* КУРСОР */
         #cursor {
             width: 8px; height: 8px;
             background: #000;
@@ -60,29 +61,22 @@
             pointer-events: none;
             z-index: 10000;
             transform: translate(-50%, -50%);
-            display: none; /* Включаем через JS только на десктопе */
+            display: none;
         }
 
         .top-bar {
-            background-color: #000000;
-            color: #ffffff;
-            font-size: 10px;
-            padding: 5px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 100%;
-            height: 22px;
-            display: flex;
-            align-items: center;
+            background-color: #000000; color: #ffffff;
+            font-size: 10px; padding: 5px 0;
+            white-space: nowrap; overflow: hidden;
+            width: 100%; height: 22px;
+            display: flex; align-items: center;
         }
 
         #marquee-text { display: inline-block; will-change: transform; }
 
         .container {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px 20px 80px 20px;
+            max-width: 600px; width: 100%; margin: 0 auto;
+            padding: 20px 20px 100px 20px;
         }
 
         .title-wrapper { display: flex; align-items: center; gap: 5px; margin-bottom: 15px; }
@@ -90,36 +84,26 @@
         .title-flag { height: 18px; width: auto; }
 
         .link-text {
-            display: block;
-            font-weight: bold;
-            font-size: 13px;
-            text-transform: uppercase;
-            color: #000000;
-            text-decoration: none;
-            margin-bottom: 5px;
-            padding: 10px 0;
-            border-bottom: 1px solid #000000;
+            display: block; font-weight: bold; font-size: 13px;
+            text-transform: uppercase; color: #000000;
+            text-decoration: none; margin-bottom: 5px;
+            padding: 10px 0; border-bottom: 1px solid #000000;
             transition: 0.3s;
         }
 
         .inst:hover { background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tgk:hover { color: #0088cc; }
         .twitch:hover { background: linear-gradient(45deg, #9146ff, #4b6cb7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tiktok:hover { opacity: 0.6; }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
         .gallery { display: flex; gap: 0; width: max-content; will-change: transform; }
-        .gallery img { width: 60vw; max-width: 350px; height: auto; object-fit: contain; flex-shrink: 0; display: block; }
+        .gallery img { width: 60vw; max-width: 350px; height: auto; display: block; }
 
         .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            pointer-events: none;
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 15px 20px; display: flex;
+            justify-content: space-between; align-items: flex-end;
+            pointer-events: none; z-index: 9999;
         }
 
         .stats {
@@ -138,7 +122,7 @@
             display: none; position: absolute; bottom: calc(100% + 5px);
             background-color: #000; color: #fff; padding: 10px;
             font-size: 9px; text-transform: uppercase; white-space: nowrap;
-            z-index: 10; border: 1px solid #333;
+            border: 1px solid #333;
         }
 
         #about-tooltip { left: 0; }
@@ -146,7 +130,6 @@
 
         @media (hover: hover) { .tooltip-wrapper:hover .tooltip-content { display: block; } }
         .tooltip-content.active { display: block; }
-
     </style>
 </head>
 <body>
@@ -154,7 +137,7 @@
     <div class="grain"></div>
     <div id="cursor"></div>
 
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop preload="auto">
         <source src="music.mp3" type="audio/mpeg">
     </audio>
 
@@ -172,7 +155,7 @@
         <a href="https://t.me" class="link-text tgk" target="_blank">tgk: @11</a>
         <a href="https://twitch.tv" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
         <a href="https://www.tiktok.com" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
-        <div id="discord-link" class="link-text tiktok">discord: @dnka</div>
+        <div id="discord-link" class="link-text">discord: @dnka</div>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
@@ -206,9 +189,8 @@
         const soundTooltip = document.getElementById('sound-tooltip');
         const cursor = document.getElementById('cursor');
 
-        // КУРСОР: Включаем только если есть мышь
+        // КУРСОР: только для ПК
         if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-            cursor.style.display = "block";
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px';
                 cursor.style.top = e.clientY + 'px';
@@ -217,78 +199,68 @@
 
         // КОПИРОВАНИЕ DISCORD
         document.getElementById('discord-link').addEventListener('click', function() {
-            const nick = "@dnka";
-            navigator.clipboard.writeText(nick).then(() => {
-                const originalText = this.innerText;
+            navigator.clipboard.writeText("@dnka").then(() => {
+                const oldText = this.innerText;
                 this.innerText = "COPIED!";
-                setTimeout(() => { this.innerText = originalText; }, 1500);
+                setTimeout(() => { this.innerText = oldText; }, 1500);
             });
         });
 
-        function toggleTooltip(tooltipElement, event) {
-            event.stopPropagation();
-            if (tooltipElement === aboutTooltip) soundTooltip.classList.remove('active');
+        // ТУЛТИПЫ
+        function toggleTooltip(el, ev) {
+            ev.stopPropagation();
+            if (el === aboutTooltip) soundTooltip.classList.remove('active');
             else aboutTooltip.classList.remove('active');
-            tooltipElement.classList.toggle('active');
+            el.classList.toggle('active');
         }
-
         aboutBtn.addEventListener('click', (e) => toggleTooltip(aboutTooltip, e));
-        muteBtn.addEventListener('click', (e) => toggleTooltip(soundTooltip, e));
 
         document.addEventListener('click', () => {
             aboutTooltip.classList.remove('active');
             soundTooltip.classList.remove('active');
         });
 
-        const phrases = [
-            "ALL BUTTONS CLICKABLE",
-            "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX",
-        ];
-        let phraseIndex = 0;
-        let xPos = window.innerWidth;
-
-        function updateMarquee() {
-            xPos -= 2.5;
+        // БЕГУЩАЯ СТРОКА
+        const phrases = ["ALL BUTTONS CLICKABLE", "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX"];
+        let pIdx = 0, xPos = window.innerWidth;
+        function moveMarquee() {
+            xPos -= 2;
             if (xPos < -marqueeEl.offsetWidth) {
                 xPos = window.innerWidth;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                marqueeEl.innerText = phrases[phraseIndex];
+                pIdx = (pIdx + 1) % phrases.length;
+                marqueeEl.innerText = phrases[pIdx];
             }
             marqueeEl.style.transform = `translateX(${xPos}px)`;
-            requestAnimationFrame(updateMarquee);
+            requestAnimationFrame(moveMarquee);
         }
-        updateMarquee();
+        moveMarquee();
 
-        let playing = false;
-        let currentPos = 0;
-        let currentSpeed = 0;
-        let targetSpeed = 0;
-        const maxSpeed = 1.2;
-        const accel = 0.03;
-
-        function animateGallery() {
-            if (currentSpeed < targetSpeed) currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
-            else if (currentSpeed > targetSpeed) currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
-            currentPos -= currentSpeed;
-            if (Math.abs(currentPos) >= gallery.offsetWidth / 2) currentPos = 0;
-            gallery.style.transform = `translateX(${currentPos}px)`;
-            requestAnimationFrame(animateGallery);
+        // ГАЛЕРЕЯ И ЗВУК
+        let playing = false, gPos = 0, gSpeed = 0, targetG = 0;
+        function animG() {
+            if (gSpeed < targetG) gSpeed = Math.min(gSpeed + 0.03, targetG);
+            else if (gSpeed > targetG) gSpeed = Math.max(gSpeed - 0.03, targetG);
+            gPos -= gSpeed;
+            if (Math.abs(gPos) >= gallery.offsetWidth / 2) gPos = 0;
+            gallery.style.transform = `translateX(${gPos}px)`;
+            requestAnimationFrame(animG);
         }
+        animG();
 
-        function togglePlay() {
-            if (playing) {
-                muteBtn.innerText = "[ SOUND: OFF ]";
-                targetSpeed = 0; audio.pause();
-            } else {
-                audio.play().catch(e => console.log("Blocked"));
+        muteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleTooltip(soundTooltip, e);
+            if (!playing) {
+                audio.play().catch(() => {});
                 muteBtn.innerText = "[ SOUND: ON ]";
-                targetSpeed = maxSpeed;
+                targetG = 1.2;
+            } else {
+                audio.pause();
+                muteBtn.innerText = "[ SOUND: OFF ]";
+                targetG = 0;
             }
             playing = !playing;
-        }
-
-        muteBtn.addEventListener('click', (e) => { e.stopPropagation(); }); 
-        animateGallery();
+        });
     </script>
 </body>
 </html>
