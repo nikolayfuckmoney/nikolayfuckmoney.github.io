@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Жесткий запрет зума на уровне метатега -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>dnka links</title>
     <style>
@@ -15,6 +14,7 @@
         body.dark-mode {
             --bg-color: #000000;
             --main-color: #ffffff;
+            --bg-image: none;
         }
 
         body.custom-mode {
@@ -29,8 +29,6 @@
             letter-spacing: -0.8px; 
             -webkit-user-select: none; 
             user-select: none; 
-            -webkit-touch-callout: none;
-            /* Запрет системных реакций на тапы */
             touch-action: none; 
         }
 
@@ -63,12 +61,10 @@
             transition: opacity 0.3s ease;
         }
 
-        /* Единый монолитный блок для верхней панели */
         .top-bar {
             background: var(--main-color); 
             color: var(--bg-color); 
             font-size: 10px; 
-            /* Высота включает в себя зону челки */
             height: calc(22px + env(safe-area-inset-top)); 
             padding-top: env(safe-area-inset-top);
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
@@ -106,7 +102,11 @@
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
-        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 15px; transition: color 0.5s; }
+        .copyright { 
+            font-size: 8px; text-transform: uppercase; color: var(--main-color); 
+            margin-top: 5px; /* Минимальный отступ от фото */
+            transition: color 0.5s; 
+        }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -198,7 +198,6 @@
         let cursorX = mouseX, cursorY = mouseY;
         let animationsStarted = false;
 
-        // Фразы для поочередного показа
         const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let phraseIndex = 0;
 
@@ -210,12 +209,7 @@
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
-        modeBtn.addEventListener('mousedown', startPress);
-        modeBtn.addEventListener('touchstart', (e) => { startPress(); });
-        modeBtn.addEventListener('mouseup', endPress);
-        modeBtn.addEventListener('touchend', endPress);
-
-        function startPress() {
+        modeBtn.addEventListener('mousedown', (e) => {
             pressTimer = setTimeout(() => {
                 document.body.classList.remove('dark-mode');
                 document.body.classList.toggle('custom-mode');
@@ -224,17 +218,32 @@
                 updateMusic();
                 pressTimer = null;
             }, 1000); 
-        }
+        });
 
-        function endPress() {
+        modeBtn.addEventListener('touchstart', (e) => {
+            pressTimer = setTimeout(() => {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.toggle('custom-mode');
+                const isCustom = document.body.classList.contains('custom-mode');
+                modeBtn.innerText = isCustom ? "[ MODE: CUSTOM ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
+                pressTimer = null;
+            }, 1000);
+        });
+
+        const endPress = (e) => {
             if (pressTimer) {
                 clearTimeout(pressTimer);
                 if (document.body.classList.contains('custom-mode')) return;
                 isDarkMode = !isDarkMode;
                 document.body.classList.toggle('dark-mode', isDarkMode);
                 modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+                pressTimer = null;
             }
-        }
+        };
+
+        modeBtn.addEventListener('mouseup', endPress);
+        modeBtn.addEventListener('touchend', endPress);
 
         const updateCursorPos = (e) => {
             cursor.style.opacity = '1';
@@ -289,9 +298,9 @@
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                // Логика поочередной бегущей строки
-                marqueePos -= 1.5; 
-                if (marqueePos < -marqueeEl.offsetWidth) {
+                // Моментальное переключение фраз без большой паузы
+                marqueePos -= 2.0; 
+                if (marqueePos < -marqueeEl.offsetWidth - 20) { // Небольшой зазор в 20px
                     marqueePos = window.innerWidth;
                     phraseIndex = (phraseIndex + 1) % phrases.length;
                     marqueeEl.innerText = phrases[phraseIndex];
