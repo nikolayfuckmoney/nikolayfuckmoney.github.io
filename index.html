@@ -23,10 +23,16 @@
             --bg-image: url('r4.6.png');
         }
 
+        /* Запрет выделения текста и зума */
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
             letter-spacing: -0.8px; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none;
         }
 
         @font-face {
@@ -46,6 +52,7 @@
             overflow: hidden; display: flex; flex-direction: column; 
             align-items: center;
             transition: background 0.5s ease, color 0.5s ease;
+            touch-action: none; /* Полный запрет системных жестов и зума */
         }
 
         #custom-cursor {
@@ -56,7 +63,8 @@
             mix-blend-mode: difference;
             background: #fff;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            /* Уменьшено время перехода для устранения "рваности" */
+            transition: opacity 0.5s ease, left 0.1s linear, top 0.1s linear;
         }
 
         .top-bar {
@@ -64,9 +72,15 @@
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: opacity 0.8s ease, background 0.5s, color 0.5s; z-index: 50;
             overflow: hidden;
+            border-bottom: 1px solid var(--main-color);
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; flex: 1; }
+        #marquee-text { 
+            white-space: nowrap; 
+            will-change: transform; 
+            flex: 1; 
+            display: block; /* Сплошная линия */
+        }
 
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
@@ -152,7 +166,7 @@
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text" style="padding-left: 20px;">ALL BUTTONS CLICKABLE</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE — DM ME FOR ADS/SONG - @EELEVEX (4FREE)</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -214,11 +228,11 @@
             else { audioCustom.pause(); audioDefault.play(); }
         }
 
-        // MODE BUTTON LOGIC (HOLD FOR CUSTOM)
+        // Кнопка MODE (Зажатие)
         modeBtn.addEventListener('mousedown', startPress);
-        modeBtn.addEventListener('touchstart', startPress);
+        modeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); });
         modeBtn.addEventListener('mouseup', endPress);
-        modeBtn.addEventListener('touchend', endPress);
+        modeBtn.addEventListener('touchend', (e) => { e.preventDefault(); endPress(); });
 
         function startPress() {
             pressTimer = setTimeout(() => {
@@ -241,7 +255,7 @@
             }
         }
 
-        // ПРАВИЛЬНАЯ ЛОГИКА КУРСОРA ИЗ СТАРОГО КОДА
+        // КУРСОР: Плавный и точный трекинг
         const showCursor = (e) => {
             cursor.style.opacity = '1';
             updateCursorPos(e);
@@ -250,19 +264,15 @@
         };
 
         const updateCursorPos = (e) => {
-            const isTouch = e.type.startsWith('touch');
-            // Точный трекинг пальца через touches[0]
-            const x = isTouch ? (e.touches[0] ? e.touches[0].clientX : null) : e.clientX;
-            const y = isTouch ? (e.touches[0] ? e.touches[0].clientY : null) : e.clientY;
-
-            if (x !== null && y !== null) {
-                if (e.type === 'touchstart' || e.type === 'touchmove') {
-                    // Плавная анимация перемещения для сенсора
-                    cursor.style.transition = 'left 0.6s cubic-bezier(0.25, 1, 0.5, 1), top 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s';
-                } else {
-                    cursor.style.transition = 'opacity 0.5s';
-                }
-                
+            let x, y;
+            if (e.touches && e.touches.length > 0) {
+                x = e.touches[0].clientX;
+                y = e.touches[0].clientY;
+            } else {
+                x = e.clientX;
+                y = e.clientY;
+            }
+            if (x !== undefined && y !== undefined) {
                 cursor.style.left = x + 'px';
                 cursor.style.top = y + 'px';
             }
@@ -271,8 +281,7 @@
         window.addEventListener('mousemove', showCursor);
         window.addEventListener('touchstart', showCursor);
         window.addEventListener('mousemove', updateCursorPos);
-        window.addEventListener('touchstart', updateCursorPos);
-        window.addEventListener('touchmove', updateCursorPos);
+        window.addEventListener('touchmove', updateCursorPos, { passive: true });
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -303,8 +312,6 @@
 
         let currentSpeed = 0, targetSpeed = 0, galleryPos = 0;
         let marqueePos = window.innerWidth;
-        const marqueePhrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
-        let currentPhraseIdx = 0;
 
         function startAnimations() {
             function update() {
@@ -312,11 +319,10 @@
                 galleryPos -= currentSpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
+
                 marqueePos -= 1.5; 
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
-                    currentPhraseIdx = (currentPhraseIdx + 1) % marqueePhrases.length;
-                    marqueeEl.innerText = marqueePhrases[currentPhraseIdx];
                 }
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
                 requestAnimationFrame(update);
