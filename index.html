@@ -2,11 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka links</title>
-    <link rel="icon" type="image/png" href="dnka_icon.png?v=3">
     <style>
-        * { box-sizing: border-box; }
+        /* 1. КУРСОР - ЧЕРНАЯ ТОЧКА */
+        * { cursor: none !important; box-sizing: border-box; }
 
         @font-face {
             font-family: 'Bookish Book';
@@ -16,296 +16,206 @@
 
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background: #ffffff; /* Установлен белый фон */
-            color: #000000;
-            margin: 0; padding: 0;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+            background: #ffffff; color: #000000;
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
         }
+
+        #custom-cursor {
+            width: 6px; height: 6px;
+            background: #000; border-radius: 50%;
+            position: fixed; pointer-events: none;
+            z-index: 10001; transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s; /* Плавное увеличение */
+        }
+        
+        /* Увеличение точки при наведении на интерактив */
+        .cursor-hover { width: 12px !important; height: 12px !important; }
 
         .top-bar {
-            background-color: #000000;
-            color: #ffffff;
-            font-size: 10px;
-            padding: 5px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 100%;
-            height: 22px;
-            display: flex;
-            align-items: center;
+            background: #000; color: #fff; font-size: 10px;
+            height: 22px; display: flex; align-items: center;
+            position: fixed; top: 0; width: 100%;
+            opacity: 0; transition: opacity 0.8s; z-index: 50;
         }
 
-        #marquee-text {
-            display: inline-block;
-            will-change: transform;
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 60px;
-        }
+        #marquee-text { white-space: nowrap; will-change: transform; }
 
         .title-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 15px;
+            display: flex; align-items: center; gap: 8px;
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
+            z-index: 100;
         }
+        .title-wrapper.moved { top: 60px; }
 
-        h1 {
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin: 0;
-            letter-spacing: -0.5px;
+        h1 { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 0; }
+        .title-flag { height: 18px; width: auto; opacity: 0; transition: 0.5s; }
+        .title-wrapper.moved .title-flag { opacity: 1; }
+
+        .content-fade { 
+            opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
+            padding: 20px; margin-top: 100px; width: 100%; max-width: 500px;
+            display: flex; flex-direction: column;
         }
+        .content-fade.visible { opacity: 1; visibility: visible; }
 
-        .title-flag {
-            height: 18px;
-            width: auto;
-            margin-top: 1px;
-        }
-
+        /* 2. ВИЗУАЛЬНЫЙ ОТКЛИК (HOVER) */
         .link-text {
-            display: block;
-            font-weight: bold;
-            font-size: 13px;
-            text-transform: uppercase;
-            color: #000000;
-            text-decoration: none;
-            margin-bottom: 5px;
-            padding: 6px 0;
-            border-bottom: 1px solid #000000;
-            transition: color 0.3s ease, opacity 0.3s ease;
+            display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
+            color: #000; text-decoration: none; margin-bottom: 5px; padding: 8px 0;
+            border-bottom: 1px solid #000; transition: color 0.3s;
         }
+        .link-text:hover { color: #666; } /* Текст становится серым */
 
-        .inst:hover {
-            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 1;
-        }
-        .tgk:hover { color: #0088cc; opacity: 1; }
-        .twitch:hover {
-            background: linear-gradient(45deg, #9146ff, #4b6cb7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 1;
-        }
-        .tiktok:hover { color: #000000; opacity: 0.6; }
-
-        .gallery-container {
-            overflow: hidden;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .gallery {
-            display: flex;
-            gap: 0;
-            width: max-content;
-            will-change: transform;
-        }
-
-        .gallery img {
-            width: 60vw;
-            max-width: 350px;
-            height: auto;
-            object-fit: contain;
-            flex-shrink: 0;
-            display: block;
-        }
+        .gallery-container { overflow: hidden; width: 100%; margin-top: 25px; }
+        .gallery { display: flex; width: max-content; will-change: transform; }
+        .gallery img { width: 300px; height: auto; display: block; margin-right: 10px; }
 
         .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            pointer-events: none;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: flex-end; z-index: 200;
         }
 
         .bottom-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 8px 12px;
-            font-family: 'Bookish Book', sans-serif;
-            font-size: 10px;
-            text-transform: uppercase;
-            cursor: pointer;
-            outline: none;
-            z-index: 1000;
-            -webkit-tap-highlight-color: transparent;
-            pointer-events: auto;
+            background: #000; color: #fff; border: none; padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif; font-size: 10px;
+            text-transform: uppercase; transition: opacity 0.3s;
         }
+        .bottom-btn:hover { opacity: 0.7; }
 
-        .tooltip-wrapper {
-            position: relative;
-            display: inline-block;
-            pointer-events: auto;
-        }
-
+        .tooltip-wrapper { position: relative; }
         .tooltip-content {
-            display: none;
-            position: absolute;
-            bottom: calc(100% + 5px);
-            background-color: #000;
-            color: #fff;
-            padding: 10px;
-            font-size: 9px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            z-index: 10;
-            border: 1px solid #333;
+            display: none; position: absolute; bottom: calc(100% + 8px);
+            background: #000; color: #fff; padding: 10px; font-size: 9px;
+            text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
         }
-
+        .tooltip-wrapper:hover .tooltip-content { display: block; }
         #about-tooltip { left: 0; }
         #sound-tooltip { right: 0; }
-
-        @media (hover: hover) {
-            .tooltip-wrapper:hover .tooltip-content { display: block; }
-        }
-        .tooltip-content.active { display: block; }
-
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
-        <source src="music.mp3" type="audio/mpeg">
-    </audio>
+    <div id="custom-cursor"></div>
+    <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
-    <div class="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE</div>
+    <div class="top-bar" id="top-bar">
+        <div id="marquee-text">ALL BUTTONS CLICKABLE — HELLO IM DNKA — @OGDNKA</div>
     </div>
 
-    <div class="container">
-        <div class="title-wrapper">
-            <h1>HELLO, IM DNKA!</h1>
-            <img src="flag.png" alt="flag" class="title-flag">
-        </div>
+    <div class="title-wrapper" id="main-title">
+        <h1 id="typewriter-title"></h1>
+        <img src="flag.png" alt="flag" class="title-flag">
+    </div>
 
-        <a href="https://instagram.com" class="link-text inst" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me" class="link-text tgk" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv" class="link-text twitch" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://www.tiktok.com" class="link-text tiktok" target="_blank">tiktok: @dnkanle</a>
-        <a href="https://discord.com" class="link-text tiktok" target="_blank">discord: @dnka</a>
+    <div class="content-fade" id="main-content">
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://discord.com" class="link-text interactive" target="_blank">discord: @dnka</a>
 
         <div class="gallery-container">
             <div id="gallery-anim" class="gallery">
-                <img src="1.png" alt="1"><img src="2.png" alt="2"><img src="3.png" alt="3"><img src="4.png" alt="4"><img src="5.png" alt="5"><img src="6.png" alt="6"><img src="7.png" alt="7">
-                <img src="1.png" alt="1"><img src="2.png" alt="2"><img src="3.png" alt="3"><img src="4.png" alt="4"><img src="5.png" alt="5"><img src="6.png" alt="6"><img src="7.png" alt="7">
+                <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
+                <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
             </div>
         </div>
     </div>
 
     <div class="bottom-bar">
-        <div class="tooltip-wrapper">
-            <button class="bottom-btn" id="about-btn-el">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / fuck fat girls / 11 w2026</div>
+        <div style="display: flex; gap: 8px;">
+            <div class="tooltip-wrapper">
+                <button class="bottom-btn interactive">[ ABOUT ME ]</button>
+                <div class="tooltip-content" id="about-tooltip">19 years / love money / 11 w2026</div>
+            </div>
+            <div class="tooltip-wrapper">
+                <button class="bottom-btn interactive">[ ONLINE ]</button>
+                <div class="tooltip-content">Users online: <span id="online-count">..</span></div>
+            </div>
         </div>
-
         <div class="tooltip-wrapper">
-            <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
+            <button class="bottom-btn interactive" id="mute-btn-el">[ SOUND: OFF ]</button>
             <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
         </div>
     </div>
 
     <script>
+        const cursor = document.getElementById('custom-cursor');
+        
+        // Логика курсора
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Эффект увеличения курсора
+        document.querySelectorAll('.interactive').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+        });
+
+        // Typewriter и анимация появления
+        const titleEl = document.getElementById('typewriter-title');
+        const textToType = "HELLO, IM DNKA!";
+        let charIndex = 0;
+
+        function typeView() {
+            if (charIndex < textToType.length) {
+                titleEl.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeView, 120);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('main-title').classList.add('moved');
+                    setTimeout(() => {
+                        document.getElementById('main-content').classList.add('visible');
+                        document.getElementById('top-bar').style.opacity = '1';
+                        startAnimations();
+                    }, 1000);
+                }, 800);
+            }
+        }
+
+        let speed = 0.5;
+        function startAnimations() {
+            let galleryPos = 0;
+            let marqueePos = window.innerWidth;
+            const marqueeEl = document.getElementById('marquee-text');
+            const gallery = document.getElementById('gallery-anim');
+
+            function update() {
+                galleryPos -= speed;
+                if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
+                gallery.style.transform = `translateX(${galleryPos}px)`;
+
+                marqueePos -= 1.5;
+                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
+                marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+
         const audio = document.getElementById('bg-music');
         const muteBtn = document.getElementById('mute-btn-el');
-        const gallery = document.getElementById('gallery-anim');
-        const marqueeEl = document.getElementById('marquee-text');
-        const aboutBtn = document.getElementById('about-btn-el');
-        const aboutTooltip = document.getElementById('about-tooltip');
-        const soundTooltip = document.getElementById('sound-tooltip');
-
-        function toggleTooltip(tooltipElement, event) {
-            event.stopPropagation();
-            if (tooltipElement === aboutTooltip) {
-                soundTooltip.classList.remove('active');
-            } else {
-                aboutTooltip.classList.remove('active');
-            }
-            tooltipElement.classList.toggle('active');
-        }
-
-        aboutBtn.addEventListener('click', (e) => toggleTooltip(aboutTooltip, e));
-        muteBtn.addEventListener('click', (e) => toggleTooltip(soundTooltip, e));
-
-        document.addEventListener('click', () => {
-            aboutTooltip.classList.remove('active');
-            soundTooltip.classList.remove('active');
-        });
-
-        const phrases = [
-            "ALL BUTTONS CLICKABLE",
-            "SONG / AD SUGGESTIONS → DM - TG: @EELEVEX",
-            "VITALINA OTDAISYA DENISY, OH XO4ET CEKC"
-        ];
-        let phraseIndex = 0;
-        let xPos = window.innerWidth;
-
-        function updateMarquee() {
-            xPos -= 2.5;
-            if (xPos < -marqueeEl.offsetWidth) {
-                xPos = window.innerWidth;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                marqueeEl.innerText = phrases[phraseIndex];
-            }
-            marqueeEl.style.transform = `translateX(${xPos}px)`;
-            requestAnimationFrame(updateMarquee);
-        }
-        updateMarquee();
-
-        let playing = false;
-        let currentPos = 0;
-        let currentSpeed = 0;
-        let targetSpeed = 0;
-        const maxSpeed = 1.2;
-        const accel = 0.03;
-
-        function animateGallery() {
-            if (currentSpeed < targetSpeed) {
-                currentSpeed = Math.min(currentSpeed + accel, targetSpeed);
-            } else if (currentSpeed > targetSpeed) {
-                currentSpeed = Math.max(currentSpeed - accel, targetSpeed);
-            }
-            currentPos -= currentSpeed;
-            const halfWidth = gallery.offsetWidth / 2;
-            if (Math.abs(currentPos) >= halfWidth) currentPos = 0;
-            gallery.style.transform = `translateX(${currentPos}px)`;
-            requestAnimationFrame(animateGallery);
-        }
-
-        function togglePlay() {
-            if (playing) {
-                muteBtn.innerText = "[ SOUND: OFF ]";
-                targetSpeed = 0;
-                audio.pause();
-                audio.volume = 0;
-            } else {
-                audio.volume = 1;
-                audio.play().catch(e => console.log("Sound blocked"));
+        muteBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
                 muteBtn.innerText = "[ SOUND: ON ]";
-                targetSpeed = maxSpeed;
+                speed = 1.5;
+            } else {
+                audio.pause();
+                muteBtn.innerText = "[ SOUND: OFF ]";
+                speed = 0.5;
             }
-            playing = !playing;
-        }
-
-        muteBtn.addEventListener('click', (e) => {
-             togglePlay();
         });
 
-        animateGallery();
+        document.getElementById('online-count').innerText = Math.floor(Math.random() * 10) + 5;
+        window.onload = typeView;
     </script>
 </body>
 </html>
