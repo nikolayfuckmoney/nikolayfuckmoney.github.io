@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka links</title>
     <style>
-        /* 1. КУРСОР - ЧЕРНАЯ ТОЧКА */
         * { cursor: none !important; box-sizing: border-box; }
 
         @font-face {
@@ -22,20 +21,15 @@
         }
 
         #custom-cursor {
-            width: 6px; height: 6px;
-            background: #000; border-radius: 50%;
-            position: fixed; pointer-events: none;
-            z-index: 10001; transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s; /* Плавное увеличение */
+            width: 6px; height: 6px; background: #000; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 10001;
+            transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
         }
-        
-        /* Увеличение точки при наведении на интерактив */
         .cursor-hover { width: 12px !important; height: 12px !important; }
 
         .top-bar {
-            background: #000; color: #fff; font-size: 10px;
-            height: 22px; display: flex; align-items: center;
-            position: fixed; top: 0; width: 100%;
+            background: #000; color: #fff; font-size: 10px; height: 22px;
+            display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: opacity 0.8s; z-index: 50;
         }
 
@@ -43,35 +37,38 @@
 
         .title-wrapper {
             display: flex; align-items: center; gap: 8px;
-            position: absolute; left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
-            z-index: 100;
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 100;
         }
-        .title-wrapper.moved { top: 60px; }
+        /* 2. Поднял заголовок выше (было 60px) */
+        .title-wrapper.moved { top: 45px; }
 
         h1 { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 0; }
         .title-flag { height: 18px; width: auto; opacity: 0; transition: 0.5s; }
         .title-wrapper.moved .title-flag { opacity: 1; }
 
+        /* 2. Поднял основной контент выше (было margin-top 100px) */
         .content-fade { 
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease; 
-            padding: 20px; margin-top: 100px; width: 100%; max-width: 500px;
+            padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
             display: flex; flex-direction: column;
         }
         .content-fade.visible { opacity: 1; visibility: visible; }
 
-        /* 2. ВИЗУАЛЬНЫЙ ОТКЛИК (HOVER) */
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: #000; text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid #000; transition: color 0.3s;
         }
-        .link-text:hover { color: #666; } /* Текст становится серым */
+        .link-text:hover { color: #666; }
 
-        .gallery-container { overflow: hidden; width: 100%; margin-top: 25px; }
+        /* 1. Карусель без пробелов */
+        .gallery-container { overflow: hidden; width: 100%; margin-top: 25px; font-size: 0; }
         .gallery { display: flex; width: max-content; will-change: transform; }
-        .gallery img { width: 300px; height: auto; display: block; margin-right: 10px; }
+        .gallery img { 
+            width: 300px; height: auto; display: inline-block; 
+            margin: 0; padding: 0; border: none; /* Убраны все отступы */
+        }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -145,27 +142,27 @@
 
     <script>
         const cursor = document.getElementById('custom-cursor');
-        
-        // Логика курсора
+        const audio = document.getElementById('bg-music');
+        const muteBtn = document.getElementById('mute-btn-el');
+        const gallery = document.getElementById('gallery-anim');
+        const marqueeEl = document.getElementById('marquee-text');
+
         document.addEventListener('mousemove', e => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
         });
 
-        // Эффект увеличения курсора
         document.querySelectorAll('.interactive').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
         });
 
-        // Typewriter и анимация появления
-        const titleEl = document.getElementById('typewriter-title');
         const textToType = "HELLO, IM DNKA!";
         let charIndex = 0;
 
         function typeView() {
             if (charIndex < textToType.length) {
-                titleEl.textContent += textToType.charAt(charIndex);
+                document.getElementById('typewriter-title').textContent += textToType.charAt(charIndex);
                 charIndex++;
                 setTimeout(typeView, 120);
             } else {
@@ -180,37 +177,36 @@
             }
         }
 
-        let speed = 0.5;
-        function startAnimations() {
-            let galleryPos = 0;
-            let marqueePos = window.innerWidth;
-            const marqueeEl = document.getElementById('marquee-text');
-            const gallery = document.getElementById('gallery-anim');
+        let gallerySpeed = 0; // 1. Скорость 0 по умолчанию
+        let marqueePos = window.innerWidth;
+        let galleryPos = 0;
 
+        function startAnimations() {
             function update() {
-                galleryPos -= speed;
+                // Движение карусели
+                galleryPos -= gallerySpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
+                // Движение бегущей строки (всегда идет)
                 marqueePos -= 1.5;
                 if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+                
                 requestAnimationFrame(update);
             }
             update();
         }
 
-        const audio = document.getElementById('bg-music');
-        const muteBtn = document.getElementById('mute-btn-el');
         muteBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
                 muteBtn.innerText = "[ SOUND: ON ]";
-                speed = 1.5;
+                gallerySpeed = 1.2; // Запускаем карусель
             } else {
                 audio.pause();
                 muteBtn.innerText = "[ SOUND: OFF ]";
-                speed = 0.5;
+                gallerySpeed = 0; // Останавливаем карусель
             }
         });
 
