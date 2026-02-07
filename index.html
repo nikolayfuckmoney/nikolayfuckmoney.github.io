@@ -21,26 +21,28 @@
             align-items: center; letter-spacing: -0.5px;
         }
 
-        /* КУРСОР ПОВЕРХ ВСЕГО */
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
             position: fixed; pointer-events: none; 
             z-index: 999999 !important; 
-            transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
+            transform: translate(-50%, -50%);
             mix-blend-mode: difference;
             background: #fff;
+            opacity: 0;
+            transition: width 0.2s, height 0.2s, opacity 0.5s ease;
         }
         .cursor-hover { width: 12px !important; height: 12px !important; }
 
+        /* ИСПРАВЛЕНО: Убрана лишняя анимация высоты, оставлен только opacity */
         .top-bar {
             background: #000; color: #fff; font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: opacity 0.8s; z-index: 50;
+            opacity: 0; transition: opacity 0.8s ease; z-index: 50;
+            overflow: hidden; /* Чтобы текст не вылезал до появления */
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
 
-        /* ЗАГОЛОВОК СЛЕВА ПРИ ВХОДЕ */
         .title-wrapper {
             display: flex; align-items: center; justify-content: flex-start; gap: 10px;
             position: absolute; 
@@ -75,13 +77,9 @@
         .gallery { display: flex; width: max-content; will-change: transform; }
         .gallery img { width: 280px; height: auto; display: inline-block; margin: 0; padding: 0; }
 
-        /* КОПИРАЙТ МЕНЬШЕ И ЧЕРНЫЙ */
         .copyright {
-            font-size: 8px;
-            text-transform: uppercase;
-            color: #000;
-            margin-top: 15px;
-            letter-spacing: 1px;
+            font-size: 8px; text-transform: uppercase; color: #000;
+            margin-top: 15px; letter-spacing: 1px;
         }
 
         .bottom-bar {
@@ -133,10 +131,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text interactive" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text interactive" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text interactive" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text interactive" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text interactive" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text interactive" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -168,10 +166,26 @@
         const marqueeEl = document.getElementById('marquee-text');
         const discordBtn = document.getElementById('discord-btn');
 
-        document.addEventListener('mousemove', e => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+        const showCursor = (e) => {
+            cursor.style.opacity = '1';
+            updateCursorPos(e);
+            window.removeEventListener('mousemove', showCursor);
+            window.removeEventListener('touchstart', showCursor);
+        };
+
+        const updateCursorPos = (e) => {
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            if (x && y) {
+                cursor.style.left = x + 'px';
+                cursor.style.top = y + 'px';
+            }
+        };
+
+        window.addEventListener('mousemove', showCursor);
+        window.addEventListener('touchstart', showCursor);
+        window.addEventListener('mousemove', updateCursorPos);
+        window.addEventListener('touchmove', updateCursorPos);
 
         document.querySelectorAll('.interactive').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
@@ -199,6 +213,7 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
+                        // Сразу делаем видимой без эффекта развертывания
                         document.getElementById('top-bar').style.opacity = '1';
                         startAnimations();
                     }, 1000);
@@ -246,4 +261,3 @@
     </script>
 </body>
 </html>
-
