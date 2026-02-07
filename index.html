@@ -27,7 +27,6 @@
             --top-bar-text: #000000;
         }
 
-        /* КИСЛОТНЫЙ РЕЖИМ (ПНВ) */
         body.custom-mode {
             --bg-color: #000000;
             --main-color: #39FF14;
@@ -38,24 +37,18 @@
             --btn-text: #39FF14;
             --top-bar-bg: #000000;
             --top-bar-text: #39FF14;
-
             background-blend-mode: multiply;
             background-color: #39FF14; 
-
-            --overlay:
-                radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
-                repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
-
+            --overlay: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
+                       repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
             animation: nv-flicker 0.1s infinite;
         }
 
         @keyframes nv-flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
 
-        /* ИСПРАВЛЕННЫЙ LETTER-SPACING */
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
-            letter-spacing: 0.5px; /* Сделал расстояние чуть больше */
             -webkit-user-select: none; 
             user-select: none; 
             touch-action: none; 
@@ -95,6 +88,7 @@
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
             opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
+            letter-spacing: 0.5px; /* Сохранено */
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
@@ -104,8 +98,18 @@
             transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
 
-        h1 { font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease; }
-        .location-text { font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease; }
+        h1 { 
+            font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; 
+            color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease;
+            letter-spacing: -0.5px; /* Самое маленькое расстояние */
+        }
+        
+        .location-text { 
+            font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
+            color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease;
+            letter-spacing: 0.5px; 
+        }
+
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; }
@@ -121,13 +125,18 @@
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
+            letter-spacing: 0.2px; /* Чуть меньше обычного */
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
         .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease; }
         .gallery img { width: 280px; height: auto; }
 
-        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; transition: 0.4s ease; }
+        .copyright { 
+            font-size: 8px; text-transform: uppercase; color: var(--main-color); 
+            margin-top: 5px; transition: 0.4s ease;
+            letter-spacing: 0.5px; /* Сохранено */
+        }
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -139,6 +148,7 @@
             background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
             text-transform: uppercase; transition: 0.4s ease;
+            letter-spacing: 0.5px; /* Сохранено */
         }
 
         .tooltip-wrapper { position: relative; }
@@ -146,6 +156,7 @@
             display: none; position: absolute; bottom: calc(100% + 8px);
             background: var(--btn-bg); color: var(--btn-text); padding: 10px; font-size: 9px;
             text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
+            letter-spacing: 0.5px;
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
 
@@ -161,7 +172,7 @@
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE  /</div>
     </div>
 
     <div class="title-wrapper" id="main-title">
@@ -170,10 +181,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com/ogdnka" class="link-text" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me/eeleve" class="link-text" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv/bananapapa228" class="link-text" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com/@dnkanle" class="link-text" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com" class="link-text" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -188,7 +199,7 @@
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
             <button class="bottom-btn">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / 11 w2026</div>
         </div>
         <div style="gap: 10px; display: flex;">
             <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
@@ -215,12 +226,12 @@
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
-        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
+        const phrases = ["ALL BUTTONS CLICKABLE", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
-            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
+            soundTooltip.innerText = isCustom ? "asix300 - goga lox" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
             const cur = isCustom ? audioCustom : audioDefault;
             const other = isCustom ? audioDefault : audioCustom;
