@@ -35,7 +35,8 @@
             --btn-text: #FF8C00;
             --top-bar-bg: #800080;
             --top-bar-text: #FF8C00;
-            --gallery-filter: none;
+            /* Оранжевый эффект для фото */
+            --gallery-filter: sepia(100%) hue-rotate(15deg) saturate(300%) contrast(1.1);
             --bg-filter: none;
             background-image: none;
         }
@@ -218,7 +219,7 @@
 
         let isDarkMode = false, isMuted = true, pressTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let cursorX = mouseX, cursorY = mouseY, animationsStarted = true; // ТЕКСТ КРУТИТСЯ СРАЗУ
+        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false; // ЖДЕМ КОМАНДЫ
 
         const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
@@ -303,6 +304,7 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
+                        animationsStarted = true; // ЗАПУСКАЕМ ТЕКСТ КОГДА ВСЁ ВСТАЛО НА МЕСТА
                     }, 1000);
                 }, 800);
             }
