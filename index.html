@@ -62,7 +62,8 @@
             position: fixed; top: 0; left: 0;
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #fff; opacity: 0;
+            background: #fff; 
+            opacity: 1; /* Виден сразу */
             will-change: transform, opacity;
             transition: opacity 0.3s ease;
         }
@@ -87,9 +88,6 @@
             letter-spacing: -0.5px; min-height: 1em;
         }
 
-        .blink { animation: blink-anim 1s infinite; }
-        @keyframes blink-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        
         .location-text { 
             font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
             font-weight: bold; color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease;
@@ -115,10 +113,7 @@
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; position: relative; min-height: 220px; }
-        .gallery { 
-            display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease;
-            font-size: 0; 
-        }
+        .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease; font-size: 0; }
         .gallery img { width: 280px; height: auto; display: block; margin: 0 -1px; }
 
         /* ИГРА */
@@ -144,9 +139,7 @@
         }
         .shape-cell.active { background: var(--main-color); }
 
-        .copyright { font-size: 8px; text-transform: uppercase; color: var(--main-color); margin-top: 5px; }
-
-        /* КНОПКИ: РАЗМЕР ПО ТЕКСТУ */
+        /* КНОПКИ ОДНОЙ ВЫСОТЫ */
         .bottom-bar {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px; padding: 15px 20px;
@@ -154,7 +147,7 @@
         }
         .bottom-btn {
             background: var(--btn-bg); color: var(--btn-text); border: none;
-            padding: 4px 6px; /* Минимальные отступы для плотного прилегания */
+            height: 24px; padding: 0 8px; /* Фиксированная высота */
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
             text-transform: uppercase; transition: 0.4s ease;
             display: inline-flex; align-items: center; justify-content: center;
@@ -169,7 +162,7 @@
         #about-tooltip { left: 0; }
         #sound-tooltip { right: 0; transform-origin: right; }
 
-        @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
+        @media (min-width: 500px) { .title-wrapper { left: calc(50% - 230px); } }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -229,7 +222,6 @@
     </div>
 
     <script>
-        // ... (весь JS код из предыдущего сообщения без изменений) ...
         const cursor = document.getElementById('custom-cursor');
         const audioDefault = document.getElementById('bg-music');
         const audioCustom = document.getElementById('custom-music');
@@ -241,69 +233,20 @@
         const marqueeEl = document.getElementById('marquee-text');
         const topBar = document.getElementById('top-bar');
         const discordBtn = document.getElementById('discord-btn');
-        const soundTooltip = document.getElementById('sound-tooltip');
         const typewriterTitle = document.getElementById('typewriter-title');
         const gridEl = document.getElementById('grid');
         const piecesEl = document.getElementById('pieces-container');
         const scoreEl = document.getElementById('score');
 
-        let isDarkMode = false, isMuted = true, pressTimer;
+        let isDarkMode = false, isMuted = true, pressTimer, idleTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
-        let idleTimer;
-        let canShowCursor = false; 
+        let cursorX = mouseX, cursorY = mouseY;
+        let animationsStarted = false;
 
-        let board = Array(64).fill(0), score = 0, shapesUsed = 0;
-        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
-        let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
-        let galleryPos = 0, currentGallerySpeed = 0, targetGallerySpeed = 0;
-
-        function updateMusic() {
-            const isCustom = document.body.classList.contains('custom-mode');
-            playBtn.style.display = isCustom ? "block" : "none";
-            if (!isCustom) { gameBox.style.display = "none"; gallery.style.display = "flex"; }
-            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
-            if (isMuted) return;
-            const cur = isCustom ? audioCustom : audioDefault;
-            const other = isCustom ? audioDefault : audioCustom;
-            other.pause(); cur.play();
-        }
-
-        const handleStart = () => {
-            pressTimer = setTimeout(() => {
-                const active = document.body.classList.toggle('custom-mode');
-                if (active) document.body.classList.remove('dark-mode');
-                else document.body.classList.toggle('dark-mode', isDarkMode);
-                modeBtn.innerText = active ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
-                updateMusic();
-                pressTimer = null;
-            }, 800);
-        };
-
-        const handleEnd = () => {
-            if (pressTimer) {
-                clearTimeout(pressTimer);
-                if (!document.body.classList.contains('custom-mode')) {
-                    isDarkMode = !isDarkMode;
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                }
-                modeBtn.innerText = document.body.classList.contains('custom-mode') ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
-                updateMusic();
-                pressTimer = null;
-            }
-        };
-
-        modeBtn.addEventListener('pointerdown', handleStart);
-        window.addEventListener('pointerup', handleEnd);
-        topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
-        window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
-
-        const hideCursor = () => { cursor.style.opacity = '0'; };
         const resetIdleTimer = () => {
-            if (!canShowCursor) return;
             cursor.style.opacity = '1';
             clearTimeout(idleTimer);
-            idleTimer = setTimeout(hideCursor, 600);
+            idleTimer = setTimeout(() => { cursor.style.opacity = '0'; }, 600);
         };
 
         const updatePos = (e) => {
@@ -314,62 +257,93 @@
 
         window.addEventListener('mousemove', updatePos, { passive: true });
         window.addEventListener('touchstart', updatePos, { passive: false });
-        window.addEventListener('touchmove', (e) => { updatePos(e); }, { passive: false });
-        
-        document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; clearTimeout(idleTimer); });
-        document.addEventListener('mouseenter', resetIdleTimer);
+        window.addEventListener('touchmove', updatePos, { passive: false });
+        document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
+        document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
 
-        discordBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText('dnka').then(() => {
-                const old = discordBtn.innerText; discordBtn.innerText = 'COPIED!';
-                setTimeout(() => discordBtn.innerText = old, 2000);
-            });
+        function updateMusic() {
+            const isCustom = document.body.classList.contains('custom-mode');
+            playBtn.style.display = isCustom ? "block" : "none";
+            if (!isCustom) { gameBox.style.display = "none"; gallery.style.display = "flex"; }
+            if (isMuted) return;
+            const cur = isCustom ? audioCustom : audioDefault;
+            const other = isCustom ? audioDefault : audioCustom;
+            other.pause(); cur.play();
+        }
+
+        modeBtn.addEventListener('pointerdown', () => {
+            pressTimer = setTimeout(() => {
+                const active = document.body.classList.toggle('custom-mode');
+                if (active) document.body.classList.remove('dark-mode');
+                else if (isDarkMode) document.body.classList.add('dark-mode');
+                modeBtn.innerText = active ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
+                pressTimer = null;
+            }, 800);
         });
 
-        const textToType = "HELLO, IM DNKA!";
-        let charIdx = 0;
-        function typeView() {
-            if (charIdx < textToType.length) {
-                typewriterTitle.textContent += textToType.charAt(charIdx++);
-                setTimeout(typeView, 120);
-            } else {
-                typewriterTitle.classList.add('blink');
-                setTimeout(() => {
-                    typewriterTitle.classList.remove('blink');
-                    document.getElementById('main-title').classList.add('moved');
-                    setTimeout(() => {
-                        document.getElementById('main-content').classList.add('visible');
-                        topBar.style.opacity = '1';
-                        animationsStarted = true;
-                        canShowCursor = true; 
-                    }, 1000);
-                }, 2000);
+        window.addEventListener('pointerup', () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                if (!document.body.classList.contains('custom-mode')) {
+                    isDarkMode = !isDarkMode;
+                    document.body.classList.toggle('dark-mode', isDarkMode);
+                }
+                modeBtn.innerText = document.body.classList.contains('custom-mode') ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
+                pressTimer = null;
             }
+        });
+
+        function typeView() {
+            const text = "HELLO, IM DNKA!"; let idx = 0;
+            const t = setInterval(() => {
+                if(idx < text.length) typewriterTitle.textContent += text[idx++];
+                else { 
+                    clearInterval(t); 
+                    setTimeout(() => {
+                        document.getElementById('main-title').classList.add('moved');
+                        setTimeout(() => {
+                            document.getElementById('main-content').classList.add('visible');
+                            topBar.style.opacity = '1';
+                            animationsStarted = true;
+                        }, 1000);
+                    }, 1000);
+                }
+            }, 120);
         }
+
+        let marqueePos = window.innerWidth, marqueeSpeed = 2.0;
+        let galleryPos = 0, currentGalSpeed = 0, targetGalSpeed = 0;
 
         function loop() {
             cursorX += (mouseX - cursorX) * 0.25;
             cursorY += (mouseY - cursorY) * 0.25;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+
             if (animationsStarted) {
-                currentGallerySpeed += (targetGallerySpeed - currentGallerySpeed) * 0.05;
-                galleryPos -= currentGallerySpeed;
+                currentGalSpeed += (targetGalSpeed - currentGalSpeed) * 0.05;
+                galleryPos -= currentGalSpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
                 gallery.style.transform = `translateX(${galleryPos}px)`;
 
-                marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
-                marqueePos -= marqueeCurrentSpeed;
-                if (marqueePos < -marqueeEl.offsetWidth) {
-                    marqueePos = window.innerWidth;
-                    currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
-                    marqueeEl.innerText = phrases[currentPhraseIdx];
-                }
+                marqueePos -= marqueeSpeed;
+                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
             }
             requestAnimationFrame(loop);
         }
 
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            const cur = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
+            if (!isMuted) { cur.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetGalSpeed = 1.2; }
+            else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetGalSpeed = 0; }
+        });
+
         const shapes = [[[1,1,0],[1,1,0],[0,0,0]], [[1,1,1],[0,0,0],[0,0,0]], [[1,0,0],[1,0,0],[1,0,0]], [[1,1,0],[0,1,0],[0,1,0]], [[1,1,1],[1,1,1],[1,1,1]], [[1,1,1,1,1]], [[1,0,0],[0,0,0],[0,0,0]]];
+        let board = Array(64).fill(0), score = 0, shapesUsed = 0;
+
         function initGame() {
             gridEl.innerHTML = ''; board.fill(0); score = 0; scoreEl.innerText = '0';
             for(let i=0; i<64; i++) gridEl.appendChild(document.createElement('div')).className = 'cell';
@@ -378,7 +352,7 @@
         function spawnPieces() {
             piecesEl.innerHTML = ''; shapesUsed = 0;
             for(let i=0; i<3; i++) {
-                let randIdx = (score > 1000 && Math.random() > 0.6) ? Math.floor(Math.random() * shapes.length) : Math.floor(Math.random() * 4);
+                let randIdx = Math.floor(Math.random() * (score > 1000 ? shapes.length : 4));
                 const s = shapes[randIdx];
                 const c = document.createElement('div'); c.className = 'shape-container';
                 for(let r=0; r<3; r++) for(let col=0; col<(s[0].length||3); col++) {
@@ -393,8 +367,7 @@
         function startDrag(e, el, s) {
             el.style.visibility = 'hidden'; 
             const clone = el.cloneNode(true); 
-            clone.classList.add('dragging'); 
-            clone.style.visibility = 'visible';
+            clone.classList.add('dragging'); clone.style.visibility = 'visible';
             const currentColor = getComputedStyle(document.body).getPropertyValue('--main-color');
             clone.querySelectorAll('.shape-cell.active').forEach(cell => cell.style.backgroundColor = currentColor);
             document.body.appendChild(clone);
@@ -416,7 +389,7 @@
         function tryPlace(mx, my, s) {
             const r = gridEl.getBoundingClientRect();
             const x = Math.round((mx - r.left - 40)/ (r.width/8)), y = Math.round((my - r.top - 40)/ (r.height/8));
-            if(canPlace(s, x, y)) {
+            if(x>=0 && y>=0 && x<8 && y<8 && canPlace(s, x, y)) {
                 for(let row=0; row<s.length; row++) for(let col=0; col<(s[0].length||3); col++) {
                     if(s[row] && s[row][col]) {
                         board[(y+row)*8+(x+col)] = 1;
@@ -451,14 +424,8 @@
             }
             scoreEl.innerText = score;
         }
+
         playBtn.addEventListener('click', () => { gallery.style.display='none'; gameBox.style.display='flex'; initGame(); });
-        let marqueePos = window.innerWidth;
-        muteBtn.addEventListener('click', () => {
-            isMuted = !isMuted;
-            const cur = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
-            if (!isMuted) { cur.play(); muteBtn.innerText = "[ SOUND: ON ]"; targetGallerySpeed = 1.2; }
-            else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetGallerySpeed = 0; }
-        });
         window.onload = () => { typeView(); loop(); };
     </script>
 </body>
