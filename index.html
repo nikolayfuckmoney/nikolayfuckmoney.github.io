@@ -19,12 +19,11 @@
             --gallery-height: 200px; 
         }
 
-        /* Полная блокировка жестов зума и скролла мимо контента */
         html, body {
             overflow: hidden;
             width: 100%;
             height: 100%;
-            position: fixed; /* Предотвращает отскоки на iOS */
+            position: fixed;
             touch-action: none; 
         }
 
@@ -68,7 +67,12 @@
             z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; }
+        #marquee-text { 
+            white-space: nowrap; 
+            position: absolute;
+            left: 0;
+            will-change: transform; 
+        }
 
         .main-wrapper {
             width: 100%;
@@ -145,7 +149,7 @@
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
             color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
-            -webkit-user-select: text; user-select: text; /* Разрешаем ввод текста */
+            -webkit-user-select: text; user-select: text;
         }
 
         .bottom-bar {
@@ -249,16 +253,15 @@
         const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-        let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
+        let marqueePos = window.innerWidth; // Начинаем за пределами экрана справа
+        let marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
         let cursorActive = false;
         let cursorTimeout;
 
-        // Фикс мобильного вьюпорта после ввода цвета
         bgInput.addEventListener('blur', () => {
             window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
         });
 
         document.getElementById('discord-btn').onclick = function() {
@@ -321,7 +324,10 @@
             if (animationsStarted) {
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
+                // Ресет текста, когда он полностью ушел влево
+                if (marqueePos < -marqueeEl.offsetWidth) {
+                    marqueePos = window.innerWidth;
+                }
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
                 
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
@@ -332,16 +338,11 @@
             requestAnimationFrame(loop);
         }
 
-        // Поддержка и мыши, и тача для курсора
         const updateCoords = (e) => {
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            if (!cursorActive && x !== undefined) {
-                cursorX = x; cursorY = y;
-                cursorActive = true;
-            }
             if (x !== undefined) {
+                if (!cursorActive) { cursorX = x; cursorY = y; cursorActive = true; }
                 mouseX = x; mouseY = y;
                 cursor.style.opacity = 1; 
                 clearTimeout(cursorTimeout);
