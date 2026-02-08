@@ -274,7 +274,6 @@
 
         let curFontSize = 13, curBtnSize = 28, curBtnFont = 10, curSpacing = 0.2, curImgWidth = 280;
 
-        // Остановка текста при зажатии
         topBar.addEventListener('mousedown', () => { marqueeTargetSpeed = 0; });
         topBar.addEventListener('mouseup', () => { marqueeTargetSpeed = 2.0; });
         topBar.addEventListener('mouseleave', () => { marqueeTargetSpeed = 2.0; });
@@ -302,12 +301,28 @@
                 curBtnFont += (delta > 0 ? 0.5 : -0.5);
                 root.style.setProperty('--btn-size', curBtnSize + 'px');
                 root.style.setProperty('--btn-font-size', curBtnFont + 'px');
+                // Синхронно обновляем все текстовые кнопки в футере
+                document.querySelectorAll('.bottom-btn').forEach(btn => {
+                    if(!btn.classList.contains('square-btn')) btn.style.fontSize = curBtnFont + 'px';
+                });
             } else if (type === 'space') {
                 curSpacing += delta;
                 root.style.setProperty('--base-spacing', curSpacing + 'px');
             } else if (type === 'gal') {
+                // Скрываем меню на 2 секунды для предпросмотра
+                accMenu.classList.remove('active');
+                gallery.style.opacity = '1';
+                gallery.style.visibility = 'visible';
+
                 curImgWidth += delta;
                 document.querySelectorAll('.gallery img').forEach(img => img.style.width = curImgWidth + 'px');
+
+                clearTimeout(window.previewTimer);
+                window.previewTimer = setTimeout(() => {
+                    accMenu.classList.add('active');
+                    gallery.style.opacity = '0';
+                    gallery.style.visibility = 'hidden';
+                }, 2000);
             }
         }
 
@@ -340,7 +355,7 @@
         };
 
         window.addEventListener('mousemove', updatePos, { passive: true });
-        window.addEventListener('touchstart', updatePos, { passive: false });
+        window.addEventListener('touchstart', updatePos, { passive: true });
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         window.addEventListener('blur', () => cursor.style.opacity = '0');
 
@@ -348,7 +363,7 @@
             const text = "HELLO, IM DNKA!";
             let i = 0;
             const interval = setInterval(() => {
-                typewriterTitle.textContent += text[i++];
+                if(i < text.length) typewriterTitle.textContent += text[i++];
                 if (i === text.length) {
                     clearInterval(interval);
                     setTimeout(() => {
