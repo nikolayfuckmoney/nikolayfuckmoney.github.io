@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>dnka links</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --main-color: #000000;
+            --bg-image: none;
+            --gallery-filter: grayscale(100%);
+            --bg-filter: none;
+            --overlay: none;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+            --top-bar-bg: #000000;
+            --top-bar-text: #ffffff;
+        }
+
+        body.dark-mode {
+            --bg-color: #000000;
+            --main-color: #ffffff;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+            --top-bar-bg: #ffffff;
+            --top-bar-text: #000000;
+        }
+
+        body.custom-mode {
+            --bg-color: #FF8C00; 
+            --main-color: #800080;
+            --btn-bg: #800080;
+            --btn-text: #FF8C00;
+            --top-bar-bg: #800080;
+            --top-bar-text: #FF8C00;
+            --gallery-filter: sepia(100%) hue-rotate(-10deg) saturate(500%) contrast(1.2);
+            --bg-filter: none;
+            background-image: none;
+        }
+
+        * { 
+            cursor: none !important; 
+            box-sizing: border-box; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            touch-action: none; 
+        }
+
+        @font-face {
+            font-family: 'Bookish Book';
+            src: url('Bookish-Book.ttf') format('truetype');
+            font-weight: normal; font-style: normal;
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--main-color);
+            margin: 0; height: 100vh; width: 100vw;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        #custom-cursor {
+            width: 6px; height: 6px; border-radius: 50%;
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 999999;
+            mix-blend-mode: difference;
+            background: #fff; opacity: 0;
+            will-change: transform, opacity;
+            transition: opacity 0.3s ease;
+        }
+
+        .top-bar {
+            background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
+            display: flex; align-items: center; position: fixed; top: 0; width: 100%;
+            transition: 0.5s ease; z-index: 100; overflow: hidden;
+            letter-spacing: 0.5px; opacity: 0;
+        }
+
+        #marquee-text { white-space: nowrap; will-change: transform; }
+
+        .title-wrapper {
+            display: flex; flex-direction: column; position: absolute; left: 20px; top: 50%;
+            transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
+        }
+
+        h1 { 
+            font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; 
+            color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease;
+            letter-spacing: -0.5px; min-height: 1em;
+        }
+
+        .blink { animation: blink-anim 1s infinite; }
+        @keyframes blink-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        
+        .location-text { 
+            font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
+            font-weight: bold;
+            color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease;
+            letter-spacing: 0.5px; 
+        }
+
+        .title-wrapper.moved { top: 40px; transform: translateY(0); }
+        .title-wrapper.moved h1 { font-size: 24px; }
+        .title-wrapper.moved .location-text { opacity: 1; }
+
+        .content-fade {
+            opacity: 0; visibility: hidden; transition: 0.8s;
+            padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
+            display: flex; flex-direction: column;
+        }
+        .content-fade.visible { opacity: 1; visibility: visible; }
+
+        .link-text {
+            display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
+            color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
+            border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
+            letter-spacing: 0.2px;
+        }
+
+        .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
+        .gallery { 
+            display: flex; width: max-content; 
+            filter: var(--gallery-filter); transition: filter 0.4s ease;
+            font-size: 0; 
+        }
+        .gallery img { 
+            width: 280px; 
+            height: auto; 
+            display: block; 
+            padding: 0; 
+            margin: 0 -1px; /* Убирает просветы и создает микро-наложение */
+        }
+
+        .copyright { 
+            font-size: 8px; text-transform: uppercase; color: var(--main-color); 
+            margin-top: 5px; transition: 0.4s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
+        }
+
+        .bottom-btn {
+            background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
+            font-family: 'Bookish Book', sans-serif; font-size: 10px;
+            text-transform: uppercase; transition: 0.4s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .tooltip-wrapper { position: relative; }
+        .tooltip-content {
+            display: none; position: absolute; bottom: calc(100% + 8px);
+            background: var(--btn-bg); color: var(--btn-text); padding: 10px; font-size: 9px;
+            text-transform: uppercase; white-space: nowrap; border: 1px solid #333;
+            letter-spacing: 0.5px;
+        }
+        .tooltip-wrapper:hover .tooltip-content { display: block; }
+        
+        #about-tooltip { left: 0; }
+        #sound-tooltip { right: 0; transform-origin: right; }
+
+        @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div id="custom-cursor"></div>
+    <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
+
+    <div class="top-bar" id="top-bar">
+        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
+    </div>
+
+    <div class="title-wrapper" id="main-title">
+        <h1 id="typewriter-title"></h1>
+        <div class="location-text">KHARKIV, UKRAINE</div>
+    </div>
+
+    <div class="content-fade" id="main-content">
+        <a href="https://instagram.com/ogdnka" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me/eeleve" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv/bananapapa228" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com/@dnkanle" class="link-text" target="_blank">tiktok: @dnkanle</a>
+        <a href="javascript:void(0)" class="link-text" id="discord-btn">discord: @dnka</a>
+
+        <div class="gallery-container">
+            <div id="gallery-anim" class="gallery">
+                <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
+                <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
+            </div>
+        </div>
+        <div class="copyright">© 2026 DNKA. ALL RIGHTS RESERVED.</div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="tooltip-wrapper">
+            <button class="bottom-btn">[ ABOUT ME ]</button>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
+        </div>
+        <div style="gap: 10px; display: flex;">
+            <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
+            <div class="tooltip-wrapper">
+                <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
+                <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        const audioDefault = document.getElementById('bg-music');
+        const audioCustom = document.getElementById('custom-music');
+        const muteBtn = document.getElementById('mute-btn-el');
+        const modeBtn = document.getElementById('mode-btn');
+        const gallery = document.getElementById('gallery-anim');
+        const marqueeEl = document.getElementById('marquee-text');
+        const topBar = document.getElementById('top-bar');
+        const discordBtn = document.getElementById('discord-btn');
+        const soundTooltip = document.getElementById('sound-tooltip');
+        const typewriterTitle = document.getElementById('typewriter-title');
+
+        let isDarkMode = false, isMuted = true, pressTimer;
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
+        
+        let idleTimer;
+        let canShowCursor = false; 
+
+        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
+        let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
+        let galleryPos = 0, currentGallerySpeed = 0, targetGallerySpeed = 0;
+
+        function updateMusic() {
+            const isCustom = document.body.classList.contains('custom-mode');
+            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
+            if (isMuted) return;
+            const cur = isCustom ? audioCustom : audioDefault;
+            const other = isCustom ? audioDefault : audioCustom;
+            other.pause(); cur.play();
+        }
+
+        const handleStart = () => {
+            pressTimer = setTimeout(() => {
+                const active = document.body.classList.toggle('custom-mode');
+                if (active) document.body.classList.remove('dark-mode');
+                else document.body.classList.toggle('dark-mode', isDarkMode);
+                modeBtn.innerText = active ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
+                pressTimer = null;
+            }, 800);
+        };
+
+        const handleEnd = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                if (!document.body.classList.contains('custom-mode')) {
+                    isDarkMode = !isDarkMode;
+                    document.body.classList.toggle('dark-mode', isDarkMode);
+                }
+                modeBtn.innerText = document.body.classList.contains('custom-mode') ? "[ MODE: SECRET ]" : (isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]");
+                updateMusic();
+                pressTimer = null;
+            }
+        };
+
+        modeBtn.addEventListener('pointerdown', handleStart);
+        window.addEventListener('pointerup', handleEnd);
+        topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
+        window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
+
+        const hideCursor = () => { cursor.style.opacity = '0'; };
+        const resetIdleTimer = () => {
+            if (!canShowCursor) return;
+            cursor.style.opacity = '1';
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(hideCursor, 600); // 0.6 сек
+        };
+
+        const updatePos = (e) => {
+            resetIdleTimer();
+            let ev = e.touches ? e.touches[0] : e;
+            mouseX = ev.clientX; mouseY = ev.clientY;
+        };
+
+        window.addEventListener('mousemove', updatePos, { passive: true });
+        window.addEventListener('touchstart', updatePos, { passive: false });
+        window.addEventListener('touchmove', (e) => { updatePos(e); }, { passive: false });
+        
+        document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; clearTimeout(idleTimer); });
+        document.addEventListener('mouseenter', resetIdleTimer);
+        window.addEventListener('blur', () => { cursor.style.opacity = '0'; clearTimeout(idleTimer); });
+        window.addEventListener('focus', resetIdleTimer);
+
+        discordBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText('dnka').then(() => {
+                const old = discordBtn.innerText; discordBtn.innerText = 'COPIED!';
+                setTimeout(() => discordBtn.innerText = old, 2000);
+            });
+        });
+
+        const textToType = "HELLO, IM DNKA!";
+        let charIdx = 0;
+        function typeView() {
+            if (charIdx < textToType.length) {
+                typewriterTitle.textContent += textToType.charAt(charIdx++);
+                setTimeout(typeView, 120);
+            } else {
+                typewriterTitle.classList.add('blink');
+                setTimeout(() => {
+                    typewriterTitle.classList.remove('blink');
+                    document.getElementById('main-title').classList.add('moved');
+                    
+                    setTimeout(() => {
+                        document.getElementById('main-content').classList.add('visible');
+                        topBar.style.opacity = '1';
+                        animationsStarted = true;
+                        canShowCursor = true; 
+                    }, 1000);
+                }, 2000);
+            }
+        }
+
+        let marqueePos = window.innerWidth;
+        function loop() {
+            cursorX += (mouseX - cursorX) * 0.25;
+            cursorY += (mouseY - cursorY) * 0.25;
+            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+
+            if (animationsStarted) {
+                currentGallerySpeed += (targetGallerySpeed - currentGallerySpeed) * 0.05;
+                galleryPos -= currentGallerySpeed;
+                if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
+                gallery.style.transform = `translateX(${galleryPos}px)`;
+
+                marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
+                marqueePos -= marqueeCurrentSpeed;
+                if (marqueePos < -marqueeEl.offsetWidth) {
+                    marqueePos = window.innerWidth;
+                    currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
+                    marqueeEl.innerText = phrases[currentPhraseIdx];
+                }
+                marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+            }
+            requestAnimationFrame(loop);
+        }
+
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            const cur = document.body.classList.contains('custom-mode') ? audioCustom : audioDefault;
+            if (!isMuted) { 
+                cur.play(); 
+                muteBtn.innerText = "[ SOUND: ON ]"; 
+                targetGallerySpeed = 1.2; 
+            } else { 
+                audioDefault.pause(); 
+                audioCustom.pause(); 
+                muteBtn.innerText = "[ SOUND: OFF ]"; 
+                targetGallerySpeed = 0; 
+            }
+        });
+
+        window.onload = () => { typeView(); loop(); };
+    </script>
+</body>
+</html>
