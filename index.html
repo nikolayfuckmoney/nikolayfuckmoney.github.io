@@ -52,11 +52,12 @@
         }
 
         #custom-cursor {
-            width: 6px; height: 6px; border-radius: 50%;
+            width: 18px; height: 18px; border-radius: 50%;
             position: fixed; top: 0; left: 0;
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #fff; opacity: 0;
+            background: #ffffff; 
+            opacity: 0;
             transition: opacity 0.5s ease;
             will-change: transform, opacity;
         }
@@ -253,12 +254,11 @@
         const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-        let marqueePos = window.innerWidth; // Начинаем за пределами экрана справа
+        let marqueePos = window.innerWidth;
         let marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
         let cursorActive = false;
-        let cursorTimeout;
 
         bgInput.addEventListener('blur', () => {
             window.scrollTo(0, 0);
@@ -324,7 +324,6 @@
             if (animationsStarted) {
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                // Ресет текста, когда он полностью ушел влево
                 if (marqueePos < -marqueeEl.offsetWidth) {
                     marqueePos = window.innerWidth;
                 }
@@ -342,11 +341,13 @@
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
             if (x !== undefined) {
-                if (!cursorActive) { cursorX = x; cursorY = y; cursorActive = true; }
+                if (!cursorActive) { 
+                    cursorX = x; cursorY = y; 
+                    cursorActive = true; 
+                    cursor.style.opacity = 1;
+                }
                 mouseX = x; mouseY = y;
-                cursor.style.opacity = 1; 
-                clearTimeout(cursorTimeout);
-                cursorTimeout = setTimeout(() => { cursor.style.opacity = 0; }, 1000);
+                cursor.style.opacity = 1;
             }
         };
 
