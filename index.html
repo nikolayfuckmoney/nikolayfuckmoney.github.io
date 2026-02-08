@@ -24,7 +24,7 @@
             box-sizing: border-box; 
             -webkit-user-select: none; 
             user-select: none; 
-            -webkit-tap-highlight-color: transparent;
+            touch-action: none; 
         }
 
         @font-face {
@@ -41,7 +41,6 @@
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
             transition: background 0.4s ease, color 0.4s ease;
             letter-spacing: var(--base-spacing);
-            touch-action: none;
         }
 
         #custom-cursor {
@@ -50,21 +49,17 @@
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
             background: #fff; opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.5s ease; /* Плавное исчезновение */
+            will-change: transform, opacity;
         }
 
         .top-bar {
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s;
+            z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
         }
 
-        #marquee-text { 
-            display: inline-block;
-            white-space: nowrap; 
-            will-change: transform;
-            padding-left: 100%; /* Начало из-за границы экрана */
-        }
+        #marquee-text { white-space: nowrap; will-change: transform; }
 
         .main-wrapper {
             width: 100%;
@@ -97,23 +92,21 @@
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
-            margin-top: 105px; /* 75px старых + 30px отступа от локации */
+            margin-top: 110px; /* Увеличен отступ от заголовка */
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 5px; /* Стандартный зазор между ссылками */
+            display: flex; flex-direction: column;
         }
         .content-fade.visible { opacity: 1; visibility: visible; }
 
         .link-text {
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
-            color: var(--main-color); text-decoration: none; padding: 8px 0;
+            color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
         }
 
         .gallery-container { 
             position: relative; width: 100%; height: var(--gallery-height); 
-            margin-top: 30px; /* Отступ 30 пикселей перед галереей */
+            margin-top: 35px; /* Увеличен отступ до галереи */
             overflow: hidden; transition: height 0.3s ease;
         }
         .gallery { display: flex; width: max-content; height: 100%; will-change: transform; }
@@ -149,7 +142,6 @@
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
-            margin-bottom: 10px; /* Немного места внизу */
         }
 
         .bottom-btn {
@@ -176,7 +168,7 @@
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT &nbsp;&nbsp;&nbsp;&nbsp; ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT &nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
     </div>
 
     <div class="main-wrapper">
@@ -249,31 +241,10 @@
         let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
-        
+        let cursorActive = false;
         let cursorTimeout;
-        const hideCursor = () => { cursor.style.opacity = 0; };
-        const showCursor = () => { cursor.style.opacity = 1; };
 
-        // Универсальное отслеживание координат
-        const updateCoords = (e) => {
-            if (e.touches && e.touches.length > 0) {
-                mouseX = e.touches[0].clientX;
-                mouseY = e.touches[0].clientY;
-            } else {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            }
-            showCursor();
-            clearTimeout(cursorTimeout);
-            cursorTimeout = setTimeout(hideCursor, 1000);
-        };
-
-        window.addEventListener('mousemove', updateCoords);
-        window.addEventListener('touchmove', updateCoords);
-        window.addEventListener('touchstart', updateCoords);
-        window.addEventListener('mouseenter', showCursor);
-        window.addEventListener('mouseleave', hideCursor);
-
+        // Discord Copy Logic
         document.getElementById('discord-btn').onclick = function() {
             const originalText = this.innerText;
             navigator.clipboard.writeText('dnka').then(() => {
@@ -289,34 +260,36 @@
         function getContrastYIQ(hexcolor){
             hexcolor = hexcolor.replace("#", "");
             if(hexcolor.length === 3) hexcolor = hexcolor.split('').map(s => s + s).join('');
-            const r = parseInt(hexcolor.substr(0,2),16), g = parseInt(hexcolor.substr(2,2),16), b = parseInt(hexcolor.substr(4,2),16);
-            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            var r = parseInt(hexcolor.substr(0,2),16);
+            var g = parseInt(hexcolor.substr(2,2),16);
+            var b = parseInt(hexcolor.substr(4,2),16);
+            var yiq = ((r*299)+(g*587)+(b*114))/1000;
             return (yiq >= 128) ? '#000000' : '#ffffff';
         }
 
         function changeSize(type, delta) {
             if (type === 'text') {
-                const current = parseInt(window.getComputedStyle(document.querySelector('.link-text')).fontSize);
+                let current = parseInt(window.getComputedStyle(document.querySelector('.link-text')).fontSize);
                 document.querySelectorAll('.link-text').forEach(el => el.style.fontSize = (current + delta) + 'px');
             } else if (type === 'btn') {
-                const currentSize = parseInt(root.style.getPropertyValue('--btn-size') || 28);
-                const currentFont = parseFloat(root.style.getPropertyValue('--btn-font-size') || 10);
+                let currentSize = parseInt(root.style.getPropertyValue('--btn-size') || 28);
+                let currentFont = parseFloat(root.style.getPropertyValue('--btn-font-size') || 10);
                 root.style.setProperty('--btn-size', (currentSize + delta) + 'px');
                 root.style.setProperty('--btn-font-size', (currentFont + delta/4) + 'px');
             } else if (type === 'space') {
-                const current = parseFloat(root.style.getPropertyValue('--base-spacing') || 0.2);
+                let current = parseFloat(root.style.getPropertyValue('--base-spacing') || 0.2);
                 root.style.setProperty('--base-spacing', (current + delta) + 'px');
             } else if (type === 'gal') {
-                const current = parseInt(root.style.getPropertyValue('--gallery-height') || 200);
+                let current = parseInt(root.style.getPropertyValue('--gallery-height') || 200);
                 root.style.setProperty('--gallery-height', Math.max(50, current + delta) + 'px');
             }
         }
 
         document.getElementById('bg-input').addEventListener('input', (e) => {
             let bgColor = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
-            if (bgColor.length !== 4 && bgColor.length !== 7) return;
+            if (bgColor.length < 4 && bgColor.length !== 7) return;
             root.style.setProperty('--bg-color', bgColor);
-            const adaptiveText = getContrastYIQ(bgColor);
+            let adaptiveText = getContrastYIQ(bgColor);
             root.style.setProperty('--main-color', adaptiveText);
             root.style.setProperty('--btn-bg', adaptiveText);
             root.style.setProperty('--btn-text', bgColor);
@@ -325,21 +298,16 @@
         });
 
         function loop() {
-            cursorX += (mouseX - cursorX) * 0.2;
-            cursorY += (mouseY - cursorY) * 0.2;
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
             
             if (animationsStarted) {
-                // Marquee: Возврат к старой логике "бега"
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                // Сброс когда текст полностью ушел за левый край
-                if (marqueePos < -marqueeEl.scrollWidth) {
-                    marqueePos = window.innerWidth;
-                }
+                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
-
-                // Gallery
+                
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
                 galPos -= galCurrentSpeed;
                 if (Math.abs(galPos) >= gallery.offsetWidth / 2) galPos = 0;
@@ -348,6 +316,25 @@
             requestAnimationFrame(loop);
         }
 
+        window.addEventListener('mousemove', e => { 
+            // Инициализация позиции при первом движении, чтобы не прыгал из угла
+            if (!cursorActive) {
+                cursorX = e.clientX;
+                cursorY = e.clientY;
+                cursorActive = true;
+            }
+            mouseX = e.clientX; 
+            mouseY = e.clientY; 
+            
+            cursor.style.opacity = 1; 
+            
+            // Сброс таймера исчезновения
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(() => {
+                cursor.style.opacity = 0;
+            }, 1000);
+        });
+
         document.getElementById('mute-btn').onclick = function() {
             isMuted = !isMuted;
             if(!isMuted) { audio.play(); this.innerText = "[ SOUND: ON ]"; galTargetSpeed = 1.2; }
@@ -355,10 +342,10 @@
         };
 
         document.getElementById('theme-btn').onclick = () => {
-            const currentBg = getComputedStyle(root).getPropertyValue('--bg-color').trim();
-            const newBg = (currentBg === '#ffffff' || currentBg === 'rgb(255, 255, 255)') ? '#000000' : '#ffffff';
+            let currentBg = getComputedStyle(root).getPropertyValue('--bg-color').trim();
+            let newBg = (currentBg === '#ffffff' || currentBg === 'rgb(255, 255, 255)') ? '#000000' : '#ffffff';
             root.style.setProperty('--bg-color', newBg);
-            const adaptiveText = getContrastYIQ(newBg);
+            let adaptiveText = getContrastYIQ(newBg);
             root.style.setProperty('--main-color', adaptiveText);
             root.style.setProperty('--btn-bg', adaptiveText);
             root.style.setProperty('--btn-text', newBg);
@@ -370,7 +357,6 @@
         document.getElementById('close-acc').onclick = () => document.getElementById('acc-menu').classList.remove('active');
 
         window.onload = () => {
-            marqueePos = window.innerWidth; // Начальная позиция бегущей строки
             const text = "HELLO, IM DNKA!";
             let i = 0;
             const type = setInterval(() => {
