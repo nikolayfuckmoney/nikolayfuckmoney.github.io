@@ -27,24 +27,18 @@
             --top-bar-text: #000000;
         }
 
+        /* SECRET MODE: Orange background, Purple text/buttons */
         body.custom-mode {
-            --bg-color: #000000;
-            --main-color: #39FF14;
-            --bg-image: url('r4.6.png');
-            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35); 
-            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35);
-            --btn-bg: #000000;
-            --btn-text: #39FF14;
-            --top-bar-bg: #000000;
-            --top-bar-text: #39FF14;
-            background-blend-mode: multiply;
-            background-color: #39FF14; 
-            --overlay: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
-                        repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
-            animation: nv-flicker 0.1s infinite;
+            --bg-color: #FF8C00; 
+            --main-color: #800080;
+            --btn-bg: #800080;
+            --btn-text: #FF8C00;
+            --top-bar-bg: #800080;
+            --top-bar-text: #FF8C00;
+            --gallery-filter: none;
+            --bg-filter: none;
+            background-image: none;
         }
-
-        @keyframes nv-flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
 
         * { 
             cursor: none !important; 
@@ -87,7 +81,6 @@
         .top-bar {
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            /* opacity: 0;  УБРАНО, чтобы полоска была видна сразу */
             transition: 0.4s ease; z-index: 100; overflow: hidden;
             letter-spacing: 0.5px;
         }
@@ -225,7 +218,7 @@
 
         let isDarkMode = false, isMuted = true, pressTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
+        let cursorX = mouseX, cursorY = mouseY, animationsStarted = true; // ТЕКСТ КРУТИТСЯ СРАЗУ
 
         const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
@@ -241,7 +234,7 @@
 
         function setModeText() {
             if (document.body.classList.contains('custom-mode')) {
-                modeBtn.innerText = "[ MODE: CUSTOM ]";
+                modeBtn.innerText = "[ MODE: SECRET ]";
             } else {
                 modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
             }
@@ -291,8 +284,11 @@
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
-                const old = discordBtn.innerText; discordBtn.innerText = 'COPIED!';
-                setTimeout(() => discordBtn.innerText = old, 2000);
+                const originalText = 'discord: @dnka';
+                discordBtn.innerText = 'COPIED!';
+                setTimeout(() => {
+                    discordBtn.innerText = originalText;
+                }, 2000);
             });
         });
 
@@ -307,8 +303,6 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
-                        // document.getElementById('top-bar').style.opacity = '1'; // УБРАНО, так как полоска теперь видна сразу
-                        animationsStarted = true;
                     }, 1000);
                 }, 800);
             }
