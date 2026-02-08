@@ -19,13 +19,37 @@
             --gallery-height: 200px; 
         }
 
-        /* Полная блокировка жестов зума и скролла мимо контента */
-        html, body {
-            overflow: hidden;
+        /* Фикс для Safari: растягиваем html на всю высоту */
+        html {
+            height: -webkit-fill-available;
+            background-color: var(--bg-color);
+        }
+
+        body {
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--main-color);
+            margin: 0; padding: 0;
             width: 100%;
-            height: 100%;
-            position: fixed; /* Предотвращает отскоки на iOS */
-            touch-action: none; 
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            position: fixed;
+            display: flex; flex-direction: column; align-items: center;
+            transition: background 0.4s ease, color 0.4s ease;
+            letter-spacing: var(--base-spacing);
+            touch-action: none;
+        }
+
+        /* Заполнение пустот снизу в Safari */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 100px;
+            background: var(--bg-color);
+            z-index: -1;
+            transition: background 0.4s ease;
         }
 
         * { 
@@ -40,16 +64,6 @@
             font-family: 'Bookish Book';
             src: url('Bookish-Book.ttf') format('truetype');
             font-weight: normal; font-style: normal;
-        }
-
-        body {
-            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--main-color);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center;
-            transition: background 0.4s ease, color 0.4s ease;
-            letter-spacing: var(--base-spacing);
         }
 
         #custom-cursor {
@@ -68,14 +82,19 @@
             z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; }
+        #marquee-text { 
+            white-space: nowrap; 
+            position: absolute;
+            left: 0;
+            will-change: transform; 
+        }
 
         .main-wrapper {
             width: 100%;
             max-width: 500px;
             padding: 0 20px;
             position: relative;
-            height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -145,12 +164,14 @@
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
             color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
-            -webkit-user-select: text; user-select: text; /* Разрешаем ввод текста */
+            -webkit-user-select: text; user-select: text;
         }
 
         .bottom-bar {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 500px; padding: 15px 20px;
+            position: fixed; 
+            bottom: env(safe-area-inset-bottom, 15px); /* Учет челки/панели Safari */
+            left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 500px; padding: 0 20px 15px 20px;
             display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
         }
 
@@ -249,16 +270,16 @@
         const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-        let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
+        let marqueePos = window.innerWidth;
+        let marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
         let cursorActive = false;
         let cursorTimeout;
 
-        // Фикс мобильного вьюпорта после ввода цвета
+        // Фикс прокрутки
         bgInput.addEventListener('blur', () => {
             window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
         });
 
         document.getElementById('discord-btn').onclick = function() {
@@ -268,10 +289,6 @@
                 setTimeout(() => { this.innerText = originalText; }, 1000);
             });
         };
-
-        const topBar = document.getElementById('top-bar');
-        ['mousedown', 'touchstart'].forEach(e => topBar.addEventListener(e, () => marqueeTargetSpeed = 0));
-        ['mouseup', 'touchend', 'mouseleave'].forEach(e => topBar.addEventListener(e, () => marqueeTargetSpeed = 2));
 
         function getContrastYIQ(hexcolor){
             hexcolor = hexcolor.replace("#", "");
@@ -321,7 +338,7 @@
             if (animationsStarted) {
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
+                if (marqueePos < -marqueeEl.offsetWidth) { marqueePos = window.innerWidth; }
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
                 
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
@@ -332,16 +349,11 @@
             requestAnimationFrame(loop);
         }
 
-        // Поддержка и мыши, и тача для курсора
         const updateCoords = (e) => {
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            if (!cursorActive && x !== undefined) {
-                cursorX = x; cursorY = y;
-                cursorActive = true;
-            }
             if (x !== undefined) {
+                if (!cursorActive) { cursorX = x; cursorY = y; cursorActive = true; }
                 mouseX = x; mouseY = y;
                 cursor.style.opacity = 1; 
                 clearTimeout(cursorTimeout);
