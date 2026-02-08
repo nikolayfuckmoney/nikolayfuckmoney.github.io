@@ -27,7 +27,6 @@
             --top-bar-text: #000000;
         }
 
-        /* SECRET MODE: Orange background, Purple text/buttons */
         body.custom-mode {
             --bg-color: #FF8C00; 
             --main-color: #800080;
@@ -35,7 +34,6 @@
             --btn-text: #FF8C00;
             --top-bar-bg: #800080;
             --top-bar-text: #FF8C00;
-            /* Оранжевый эффект для фото */
             --gallery-filter: sepia(100%) hue-rotate(15deg) saturate(300%) contrast(1.1);
             --bg-filter: none;
             background-image: none;
@@ -58,16 +56,20 @@
         body {
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image: var(--overlay), var(--bg-image);
-            background-size: cover;
-            background-position: center;
-            backdrop-filter: var(--bg-filter);
-            -webkit-backdrop-filter: var(--bg-filter);
             color: var(--main-color);
             margin: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
             transition: background 0.4s ease, color 0.4s ease;
         }
+
+        #loading-screen {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 14px; font-weight: bold; letter-spacing: 2px;
+            animation: pulse 1.5s infinite ease-in-out;
+            z-index: 1000;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
 
         #custom-cursor {
             width: 6px; height: 6px; border-radius: 50%;
@@ -82,7 +84,7 @@
         .top-bar {
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            transition: 0.4s ease; z-index: 100; overflow: hidden;
+            opacity: 0; transition: opacity 0.5s ease; z-index: 100; overflow: hidden;
             letter-spacing: 0.5px;
         }
 
@@ -91,6 +93,7 @@
         .title-wrapper {
             display: flex; flex-direction: column; position: absolute; left: 20px; top: 50%;
             transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
+            visibility: hidden; /* Скрыто до конца загрузки */
         }
 
         h1 { 
@@ -155,13 +158,11 @@
         }
         .tooltip-wrapper:hover .tooltip-content { display: block; }
 
-        #about-tooltip { left: 0; }
-        #sound-tooltip { right: 0; }
-
         @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
     </style>
 </head>
 <body oncontextmenu="return false;">
+    <div id="loading-screen">LOADING...</div>
     <div id="custom-cursor"></div>
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
@@ -215,30 +216,22 @@
         const marqueeEl = document.getElementById('marquee-text');
         const topBar = document.getElementById('top-bar');
         const discordBtn = document.getElementById('discord-btn');
-        const soundTooltip = document.getElementById('sound-tooltip');
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainTitle = document.getElementById('main-title');
 
         let isDarkMode = false, isMuted = true, pressTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false; // ЖДЕМ КОМАНДЫ
+        let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
         const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
-            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
             const cur = isCustom ? audioCustom : audioDefault;
             const other = isCustom ? audioDefault : audioCustom;
             other.pause(); cur.play();
-        }
-
-        function setModeText() {
-            if (document.body.classList.contains('custom-mode')) {
-                modeBtn.innerText = "[ MODE: SECRET ]";
-            } else {
-                modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
-            }
         }
 
         const handleStart = () => {
@@ -246,7 +239,9 @@
                 const active = document.body.classList.toggle('custom-mode');
                 if (active) document.body.classList.remove('dark-mode');
                 else document.body.classList.toggle('dark-mode', isDarkMode);
-                setModeText(); updateMusic();
+                if (active) modeBtn.innerText = "[ MODE: SECRET ]";
+                else modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
+                updateMusic();
                 pressTimer = null;
             }, 800);
         };
@@ -257,39 +252,32 @@
                 if (!document.body.classList.contains('custom-mode')) {
                     isDarkMode = !isDarkMode;
                     document.body.classList.toggle('dark-mode', isDarkMode);
+                    modeBtn.innerText = isDarkMode ? "[ MODE: DARK ]" : "[ MODE: LIGHT ]";
                 }
-                setModeText(); updateMusic();
+                updateMusic();
                 pressTimer = null;
             }
         };
 
         modeBtn.addEventListener('pointerdown', handleStart);
         window.addEventListener('pointerup', handleEnd);
-
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
         const updatePos = (e) => {
             cursor.style.opacity = '1';
             let ev = e.touches ? e.touches[0] : e;
-            mouseX = ev.clientX;
-            mouseY = ev.clientY;
+            mouseX = ev.clientX; mouseY = ev.clientY;
         };
 
         window.addEventListener('mousemove', updatePos, { passive: true });
         window.addEventListener('touchstart', updatePos, { passive: true });
         window.addEventListener('touchmove', updatePos, { passive: true });
-        document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
-        document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
-        window.addEventListener('blur', () => cursor.style.opacity = '0');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
-                const originalText = 'discord: @dnka';
-                discordBtn.innerText = 'COPIED!';
-                setTimeout(() => {
-                    discordBtn.innerText = originalText;
-                }, 2000);
+                const old = discordBtn.innerText; discordBtn.innerText = 'COPIED!';
+                setTimeout(() => discordBtn.innerText = old, 2000);
             });
         });
 
@@ -301,13 +289,20 @@
                 setTimeout(typeView, 120);
             } else {
                 setTimeout(() => {
-                    document.getElementById('main-title').classList.add('moved');
+                    mainTitle.classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
-                        animationsStarted = true; // ЗАПУСКАЕМ ТЕКСТ КОГДА ВСЁ ВСТАЛО НА МЕСТА
+                        topBar.style.opacity = '1'; // Показываем полоску
+                        animationsStarted = true;   // Запускаем текст
                     }, 1000);
                 }, 800);
             }
+        }
+
+        function startSite() {
+            loadingScreen.style.display = 'none';
+            mainTitle.style.visibility = 'visible';
+            typeView();
         }
 
         let marqueePos = window.innerWidth;
@@ -340,7 +335,11 @@
             else { audioDefault.pause(); audioCustom.pause(); muteBtn.innerText = "[ SOUND: OFF ]"; targetSpeed = 0; }
         });
 
-        window.onload = () => { typeView(); loop(); };
+        window.onload = () => {
+            // Имитация загрузки ресурсов (2 секунды мерцания)
+            setTimeout(startSite, 2000);
+            loop();
+        };
     </script>
 </body>
 </html>
