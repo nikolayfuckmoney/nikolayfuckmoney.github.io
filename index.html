@@ -19,12 +19,11 @@
             --gallery-height: 200px; 
         }
 
-        /* Полная блокировка жестов зума и скролла мимо контента */
         html, body {
             overflow: hidden;
             width: 100%;
             height: 100%;
-            position: fixed; /* Предотвращает отскоки на iOS */
+            position: fixed;
             touch-action: none; 
         }
 
@@ -50,19 +49,20 @@
             display: flex; flex-direction: column; align-items: center;
             transition: background 0.4s ease, color 0.4s ease;
             letter-spacing: var(--base-spacing);
+            /* Создаем контекст наложения, чтобы mix-blend-mode работал корректно */
+            isolation: isolate; 
         }
 
         #custom-cursor {
-            width: 6px; 
-            height: 6px; 
+            width: 8px; 
+            height: 8px; 
             border-radius: 50%;
             position: fixed; 
             top: 0; 
             left: 0;
             pointer-events: none; 
-            z-index: 999999;
-            /* Белый цвет + difference = черный на белом фоне, белый на черном тексте */
-            background: #ffffff !important; 
+            z-index: 9999999;
+            background-color: #ffffff !important; 
             mix-blend-mode: difference;
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -119,6 +119,7 @@
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
+            position: relative;
         }
 
         .gallery-container { 
@@ -166,6 +167,7 @@
             padding: 8px 12px; height: var(--btn-size);
             font-family: 'Bookish Book', sans-serif; font-size: var(--btn-font-size);
             text-transform: uppercase; transition: 0.4s ease; display: flex; align-items: center; justify-content: center;
+            position: relative;
         }
 
         .square-btn { width: var(--btn-size); min-width: var(--btn-size); padding: 0 !important; }
@@ -262,10 +264,7 @@
         let cursorActive = false;
         let cursorTimeout;
 
-        bgInput.addEventListener('blur', () => {
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-        });
+        bgInput.addEventListener('blur', () => { window.scrollTo(0, 0); document.body.scrollTop = 0; });
 
         document.getElementById('discord-btn').onclick = function() {
             const originalText = this.innerText;
@@ -341,11 +340,6 @@
         const updateCoords = (e) => {
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            if (!cursorActive && x !== undefined) {
-                cursorX = x; cursorY = y;
-                cursorActive = true;
-            }
             if (x !== undefined) {
                 mouseX = x; mouseY = y;
                 cursor.style.opacity = 1; 
