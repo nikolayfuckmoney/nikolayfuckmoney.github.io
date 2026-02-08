@@ -40,7 +40,7 @@
             background-blend-mode: multiply;
             background-color: #39FF14; 
             --overlay: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
-                       repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
+                        repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
             animation: nv-flicker 0.1s infinite;
         }
 
@@ -87,8 +87,9 @@
         .top-bar {
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
-            letter-spacing: 0.5px; /* Сохранено */
+            /* opacity: 0;  УБРАНО, чтобы полоска была видна сразу */
+            transition: 0.4s ease; z-index: 100; overflow: hidden;
+            letter-spacing: 0.5px;
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
@@ -101,7 +102,7 @@
         h1 { 
             font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; 
             color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease;
-            letter-spacing: -0.5px; /* Самое маленькое расстояние */
+            letter-spacing: -0.5px;
         }
         
         .location-text { 
@@ -125,7 +126,7 @@
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
-            letter-spacing: 0.2px; /* Чуть меньше обычного */
+            letter-spacing: 0.2px;
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
@@ -135,7 +136,7 @@
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
             margin-top: 5px; transition: 0.4s ease;
-            letter-spacing: 0.5px; /* Сохранено */
+            letter-spacing: 0.5px;
         }
 
         .bottom-bar {
@@ -145,10 +146,10 @@
         }
 
         .bottom-btn {
-background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
+            background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
             text-transform: uppercase; transition: 0.4s ease;
-            letter-spacing: 0.5px; /* Сохранено */
+            letter-spacing: 0.5px;
         }
 
         .tooltip-wrapper { position: relative; }
@@ -272,7 +273,7 @@ background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12
         window.addEventListener('pointerup', handleEnd);
 
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
-window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
+        window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
         const updatePos = (e) => {
             cursor.style.opacity = '1';
@@ -306,7 +307,7 @@ window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
-                        document.getElementById('top-bar').style.opacity = '1';
+                        // document.getElementById('top-bar').style.opacity = '1'; // УБРАНО, так как полоска теперь видна сразу
                         animationsStarted = true;
                     }, 1000);
                 }, 800);
