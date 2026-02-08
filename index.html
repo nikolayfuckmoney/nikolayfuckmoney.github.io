@@ -222,6 +222,7 @@
         let isDarkMode = false, isMuted = true, pressTimer;
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
+        let idleTimer; // Таймер неактивности
 
         const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
@@ -265,8 +266,16 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
-        const updatePos = (e) => {
+        // Логика скрытия курсора
+        const hideCursor = () => { cursor.style.opacity = '0'; };
+        const resetIdleTimer = () => {
             cursor.style.opacity = '1';
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(hideCursor, 1500); // 1.5 сек
+        };
+
+        const updatePos = (e) => {
+            resetIdleTimer();
             let ev = e.touches ? e.touches[0] : e;
             mouseX = ev.clientX; mouseY = ev.clientY;
         };
@@ -275,10 +284,10 @@
         window.addEventListener('touchstart', updatePos, { passive: false });
         window.addEventListener('touchmove', (e) => { updatePos(e); }, { passive: false });
         
-        document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
-        document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
-        window.addEventListener('blur', () => cursor.style.opacity = '0');
-        window.addEventListener('focus', () => cursor.style.opacity = '1');
+        document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; clearTimeout(idleTimer); });
+        document.addEventListener('mouseenter', resetIdleTimer);
+        window.addEventListener('blur', () => { cursor.style.opacity = '0'; clearTimeout(idleTimer); });
+        window.addEventListener('focus', resetIdleTimer);
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -346,7 +355,7 @@
             }
         });
 
-        window.onload = () => { typeView(); loop(); };
+        window.onload = () => { typeView(); loop(); resetIdleTimer(); };
     </script>
 </body>
 </html>
