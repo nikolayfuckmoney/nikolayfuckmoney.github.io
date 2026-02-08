@@ -19,11 +19,12 @@
             --gallery-height: 200px; 
         }
 
+        /* Полная блокировка жестов зума и скролла мимо контента */
         html, body {
             overflow: hidden;
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: fixed; /* Предотвращает отскоки на iOS */
             touch-action: none; 
         }
 
@@ -52,12 +53,11 @@
         }
 
         #custom-cursor {
-            width: 18px; height: 18px; border-radius: 50%;
+            width: 6px; height: 6px; border-radius: 50%;
             position: fixed; top: 0; left: 0;
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #ffffff; 
-            opacity: 0;
+            background: #fff; opacity: 0;
             transition: opacity 0.5s ease;
             will-change: transform, opacity;
         }
@@ -68,12 +68,7 @@
             z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
         }
 
-        #marquee-text { 
-            white-space: nowrap; 
-            position: absolute;
-            left: 0;
-            will-change: transform; 
-        }
+        #marquee-text { white-space: nowrap; will-change: transform; }
 
         .main-wrapper {
             width: 100%;
@@ -150,7 +145,7 @@
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
             color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
-            -webkit-user-select: text; user-select: text;
+            -webkit-user-select: text; user-select: text; /* Разрешаем ввод текста */
         }
 
         .bottom-bar {
@@ -254,14 +249,16 @@
         const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-        let marqueePos = window.innerWidth;
-        let marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
+        let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
         let cursorActive = false;
+        let cursorTimeout;
 
+        // Фикс мобильного вьюпорта после ввода цвета
         bgInput.addEventListener('blur', () => {
             window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
         });
 
         document.getElementById('discord-btn').onclick = function() {
@@ -324,9 +321,7 @@
             if (animationsStarted) {
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                if (marqueePos < -marqueeEl.offsetWidth) {
-                    marqueePos = window.innerWidth;
-                }
+                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
                 
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
@@ -337,17 +332,20 @@
             requestAnimationFrame(loop);
         }
 
+        // Поддержка и мыши, и тача для курсора
         const updateCoords = (e) => {
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            if (!cursorActive && x !== undefined) {
+                cursorX = x; cursorY = y;
+                cursorActive = true;
+            }
             if (x !== undefined) {
-                if (!cursorActive) { 
-                    cursorX = x; cursorY = y; 
-                    cursorActive = true; 
-                    cursor.style.opacity = 1;
-                }
                 mouseX = x; mouseY = y;
-                cursor.style.opacity = 1;
+                cursor.style.opacity = 1; 
+                clearTimeout(cursorTimeout);
+                cursorTimeout = setTimeout(() => { cursor.style.opacity = 0; }, 1000);
             }
         };
 
