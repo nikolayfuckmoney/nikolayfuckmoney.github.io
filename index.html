@@ -19,12 +19,21 @@
             --gallery-height: 200px; 
         }
 
+        /* Полная блокировка жестов зума и скролла мимо контента */
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed; /* Предотвращает отскоки на iOS */
+            touch-action: none; 
+        }
+
         * { 
             cursor: none !important; 
             box-sizing: border-box; 
             -webkit-user-select: none; 
             user-select: none; 
-            touch-action: none; 
+            -webkit-touch-callout: none;
         }
 
         @font-face {
@@ -37,8 +46,8 @@
             font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--main-color);
-            margin: 0; height: 100vh; width: 100vw;
-            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
             transition: background 0.4s ease, color 0.4s ease;
             letter-spacing: var(--base-spacing);
         }
@@ -49,7 +58,7 @@
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
             background: #fff; opacity: 0;
-            transition: opacity 0.5s ease; /* Плавное исчезновение */
+            transition: opacity 0.5s ease;
             will-change: transform, opacity;
         }
 
@@ -66,13 +75,14 @@
             max-width: 500px;
             padding: 0 20px;
             position: relative;
+            height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
         .title-wrapper {
             display: flex; flex-direction: column; position: absolute; 
-            left: 20px; top: 50vh; transform: translateY(-50%); 
+            left: 20px; top: 50%; transform: translateY(-50%); 
             transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
 
@@ -92,7 +102,7 @@
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
-            margin-top: 110px; /* Увеличен отступ от заголовка */
+            margin-top: 110px; 
             width: 100%;
             display: flex; flex-direction: column;
         }
@@ -106,8 +116,7 @@
 
         .gallery-container { 
             position: relative; width: 100%; height: var(--gallery-height); 
-            margin-top: 35px; /* Увеличен отступ до галереи */
-            overflow: hidden; transition: height 0.3s ease;
+            margin-top: 35px; overflow: hidden; transition: height 0.3s ease;
         }
         .gallery { display: flex; width: max-content; height: 100%; will-change: transform; }
         .gallery img { 
@@ -136,6 +145,7 @@
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
             color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
+            -webkit-user-select: text; user-select: text; /* Разрешаем ввод текста */
         }
 
         .bottom-bar {
@@ -236,6 +246,7 @@
         const marqueeEl = document.getElementById('marquee-text');
         const gallery = document.getElementById('gallery-anim');
         const audio = document.getElementById('bg-music');
+        const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
         let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
@@ -244,7 +255,12 @@
         let cursorActive = false;
         let cursorTimeout;
 
-        // Discord Copy Logic
+        // Фикс мобильного вьюпорта после ввода цвета
+        bgInput.addEventListener('blur', () => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+        });
+
         document.getElementById('discord-btn').onclick = function() {
             const originalText = this.innerText;
             navigator.clipboard.writeText('dnka').then(() => {
@@ -285,7 +301,7 @@
             }
         }
 
-        document.getElementById('bg-input').addEventListener('input', (e) => {
+        bgInput.addEventListener('input', (e) => {
             let bgColor = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
             if (bgColor.length < 4 && bgColor.length !== 7) return;
             root.style.setProperty('--bg-color', bgColor);
@@ -316,24 +332,26 @@
             requestAnimationFrame(loop);
         }
 
-        window.addEventListener('mousemove', e => { 
-            // Инициализация позиции при первом движении, чтобы не прыгал из угла
-            if (!cursorActive) {
-                cursorX = e.clientX;
-                cursorY = e.clientY;
+        // Поддержка и мыши, и тача для курсора
+        const updateCoords = (e) => {
+            let x = e.clientX || (e.touches && e.touches[0].clientX);
+            let y = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            if (!cursorActive && x !== undefined) {
+                cursorX = x; cursorY = y;
                 cursorActive = true;
             }
-            mouseX = e.clientX; 
-            mouseY = e.clientY; 
-            
-            cursor.style.opacity = 1; 
-            
-            // Сброс таймера исчезновения
-            clearTimeout(cursorTimeout);
-            cursorTimeout = setTimeout(() => {
-                cursor.style.opacity = 0;
-            }, 1000);
-        });
+            if (x !== undefined) {
+                mouseX = x; mouseY = y;
+                cursor.style.opacity = 1; 
+                clearTimeout(cursorTimeout);
+                cursorTimeout = setTimeout(() => { cursor.style.opacity = 0; }, 1000);
+            }
+        };
+
+        window.addEventListener('mousemove', updateCoords);
+        window.addEventListener('touchstart', updateCoords);
+        window.addEventListener('touchmove', updateCoords);
 
         document.getElementById('mute-btn').onclick = function() {
             isMuted = !isMuted;
