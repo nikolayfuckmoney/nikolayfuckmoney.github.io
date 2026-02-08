@@ -66,6 +66,8 @@
             background-image: var(--overlay), var(--bg-image);
             background-size: cover;
             background-position: center;
+            backdrop-filter: var(--bg-filter);
+            -webkit-backdrop-filter: var(--bg-filter);
             color: var(--main-color);
             margin: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
@@ -82,22 +84,11 @@
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* ИСПРАВЛЕННАЯ ПАНЕЛЬ: слитная и без задержки */
         .top-bar {
-            background: var(--top-bar-bg); 
-            color: var(--top-bar-text); 
-            font-size: 10px; 
-            padding-top: env(safe-area-inset-top); /* Отступ под челку */
-            height: calc(22px + env(safe-area-inset-top)); /* Общая высота */
-            display: flex; 
-            align-items: center; 
-            position: fixed; 
-            top: 0; 
-            width: 100%;
-            opacity: 1; /* Видна сразу */
-            z-index: 100; 
-            overflow: hidden;
-            letter-spacing: 0.5px;
+            background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
+            display: flex; align-items: center; position: fixed; top: 0; width: 100%;
+            opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
+            letter-spacing: 0.5px; /* Сохранено */
         }
 
         #marquee-text { white-space: nowrap; will-change: transform; }
@@ -110,7 +101,7 @@
         h1 { 
             font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; 
             color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.5px; /* Самое маленькое расстояние */
         }
         
         .location-text { 
@@ -119,16 +110,13 @@
             letter-spacing: 0.5px; 
         }
 
-        /* Корректировка позиции при перемещении */
-        .title-wrapper.moved { top: calc(40px + env(safe-area-inset-top)); transform: translateY(0); }
+        .title-wrapper.moved { top: 40px; transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; }
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
-            padding: 20px; 
-            margin-top: calc(85px + env(safe-area-inset-top)); /* Учитываем высоту панели */
-            width: 100%; max-width: 500px;
+            padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
             display: flex; flex-direction: column;
         }
         .content-fade.visible { opacity: 1; visibility: visible; }
@@ -137,7 +125,7 @@
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.2px; /* Чуть меньше обычного */
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
@@ -147,22 +135,20 @@
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
             margin-top: 5px; transition: 0.4s ease;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.5px; /* Сохранено */
         }
 
         .bottom-bar {
-            position: fixed; 
-            bottom: env(safe-area-inset-bottom);
-            left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
         }
 
         .bottom-btn {
-            background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
+background: var(--btn-bg); color: var(--btn-text); border: none; padding: 8px 12px;
             font-family: 'Bookish Book', sans-serif; font-size: 10px;
             text-transform: uppercase; transition: 0.4s ease;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.5px; /* Сохранено */
         }
 
         .tooltip-wrapper { position: relative; }
@@ -195,10 +181,10 @@
     </div>
 
     <div class="content-fade" id="main-content">
-        <a href="https://instagram.com" class="link-text" target="_blank">Inst: @ogdnka</a>
-        <a href="https://t.me" class="link-text" target="_blank">tgk: @11</a>
-        <a href="https://twitch.tv" class="link-text" target="_blank">Twitch: @bananapapa228</a>
-        <a href="https://tiktok.com" class="link-text" target="_blank">tiktok: @dnkanle</a>
+        <a href="https://instagram.com/ogdnka" class="link-text" target="_blank">Inst: @ogdnka</a>
+        <a href="https://t.me/eeleve" class="link-text" target="_blank">tgk: @11</a>
+        <a href="https://twitch.tv/bananapapa228" class="link-text" target="_blank">Twitch: @bananapapa228</a>
+        <a href="https://tiktok.com/@dnkanle" class="link-text" target="_blank">tiktok: @dnkanle</a>
         <a href="javascript:void(0)" class="link-text" id="discord-btn">discord: @dnka</a>
 
         <div class="gallery-container">
@@ -240,7 +226,7 @@
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
-        const phrases =;
+        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
@@ -284,8 +270,9 @@
 
         modeBtn.addEventListener('pointerdown', handleStart);
         window.addEventListener('pointerup', handleEnd);
+
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
-        window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
+window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
         const updatePos = (e) => {
             cursor.style.opacity = '1';
@@ -299,6 +286,7 @@
         window.addEventListener('touchmove', updatePos, { passive: true });
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+        window.addEventListener('blur', () => cursor.style.opacity = '0');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -318,6 +306,7 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
+                        document.getElementById('top-bar').style.opacity = '1';
                         animationsStarted = true;
                     }, 1000);
                 }, 800);
@@ -326,8 +315,8 @@
 
         let marqueePos = window.innerWidth;
         function loop() {
-            cursorX += (mouseX - cursorX) * 0.15;
-            cursorY += (mouseY - cursorY) * 0.15;
+            cursorX += (mouseX - cursorX) * 0.25;
+            cursorY += (mouseY - cursorY) * 0.25;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
             if (animationsStarted) {
