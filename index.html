@@ -27,8 +27,31 @@
             --top-bar-text: #000000;
         }
 
-        * {
-            box-sizing: border-box;
+        body.custom-mode {
+            --bg-color: #000000;
+            --main-color: #39FF14;
+            --bg-image: url('r4.6.png');
+            --gallery-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35); 
+            --bg-filter: sepia(100%) hue-rotate(85deg) brightness(1.0) saturate(5) contrast(1.35);
+            --btn-bg: #000000;
+            --btn-text: #39FF14;
+            --top-bar-bg: #000000;
+            --top-bar-text: #39FF14;
+            background-blend-mode: multiply;
+            background-color: #39FF14; 
+            --overlay: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.85) 100%),
+                       repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.06) 0px, rgba(57, 255, 20, 0.06) 1px, transparent 2px, transparent 4px);
+            animation: nv-flicker 0.1s infinite;
+        }
+
+        @keyframes nv-flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
+
+        * { 
+            cursor: none !important; 
+            box-sizing: border-box; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            touch-action: none; 
         }
 
         @font-face {
@@ -43,8 +66,6 @@
             background-image: var(--overlay), var(--bg-image);
             background-size: cover;
             background-position: center;
-            backdrop-filter: var(--bg-filter);
-            -webkit-backdrop-filter: var(--bg-filter);
             color: var(--main-color);
             margin: 0; height: 100vh; width: 100vw;
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
@@ -61,10 +82,21 @@
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* ИСПРАВЛЕННАЯ ПАНЕЛЬ: слитная и без задержки */
         .top-bar {
-            background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
-            display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            opacity: 0; transition: 0.4s ease; z-index: 100; overflow: hidden;
+            background: var(--top-bar-bg); 
+            color: var(--top-bar-text); 
+            font-size: 10px; 
+            padding-top: env(safe-area-inset-top); /* Отступ под челку */
+            height: calc(22px + env(safe-area-inset-top)); /* Общая высота */
+            display: flex; 
+            align-items: center; 
+            position: fixed; 
+            top: 0; 
+            width: 100%;
+            opacity: 1; /* Видна сразу */
+            z-index: 100; 
+            overflow: hidden;
             letter-spacing: 0.5px;
         }
 
@@ -75,25 +107,28 @@
             transform: translateY(-50%); transition: 1s cubic-bezier(0.65, 0, 0.35, 1); z-index: 90;
         }
 
-        h1 {
-            font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0;
+        h1 { 
+            font-size: 14px; font-weight: bold; text-transform: uppercase; margin: 0; 
             color: var(--main-color); transition: color 0.4s ease, font-size 0.8s ease;
             letter-spacing: -0.5px;
         }
-
-        .location-text {
-            font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0;
+        
+        .location-text { 
+            font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
             color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.5px; 
         }
 
-        .title-wrapper.moved { top: 40px; transform: translateY(0); }
+        /* Корректировка позиции при перемещении */
+        .title-wrapper.moved { top: calc(40px + env(safe-area-inset-top)); transform: translateY(0); }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; }
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
-            padding: 20px; margin-top: 75px; width: 100%; max-width: 500px;
+            padding: 20px; 
+            margin-top: calc(85px + env(safe-area-inset-top)); /* Учитываем высоту панели */
+            width: 100%; max-width: 500px;
             display: flex; flex-direction: column;
         }
         .content-fade.visible { opacity: 1; visibility: visible; }
@@ -109,14 +144,16 @@
         .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease; }
         .gallery img { width: 280px; height: auto; }
 
-        .copyright {
-            font-size: 8px; text-transform: uppercase; color: var(--main-color);
+        .copyright { 
+            font-size: 8px; text-transform: uppercase; color: var(--main-color); 
             margin-top: 5px; transition: 0.4s ease;
             letter-spacing: 0.5px;
         }
 
         .bottom-bar {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            position: fixed; 
+            bottom: env(safe-area-inset-bottom);
+            left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 500px; padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: flex-end; z-index: 200;
         }
@@ -143,7 +180,7 @@
         @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
     <div id="custom-cursor"></div>
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
     <audio id="custom-music" loop><source src="music1.mp3" type="audio/mpeg"></audio>
@@ -176,13 +213,13 @@
     <div class="bottom-bar">
         <div class="tooltip-wrapper">
             <button class="bottom-btn">[ ABOUT ME ]</button>
-            <div class="tooltip-content" id="about-tooltip"></div>
+            <div class="tooltip-content" id="about-tooltip">19 years / love money / hate fat bitches / 11 w2026</div>
         </div>
         <div style="gap: 10px; display: flex;">
             <button class="bottom-btn" id="mode-btn">[ MODE: LIGHT ]</button>
             <div class="tooltip-wrapper">
                 <button class="bottom-btn" id="mute-btn-el">[ SOUND: OFF ]</button>
-                <div class="tooltip-content" id="sound-tooltip"></div>
+                <div class="tooltip-content" id="sound-tooltip">VZk1ll Turbo 2000 - MESTO SMERTI</div>
             </div>
         </div>
     </div>
@@ -203,11 +240,12 @@
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
 
-        const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
+        const phrases =;
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0, galleryPos = 0, targetSpeed = 0;
 
         function updateMusic() {
             const isCustom = document.body.classList.contains('custom-mode');
+            soundTooltip.innerText = isCustom ? "ROAD2GOD - LOVEFOOL" : "VZk1ll Turbo 2000 - MESTO SMERTI";
             if (isMuted) return;
             const cur = isCustom ? audioCustom : audioDefault;
             const other = isCustom ? audioDefault : audioCustom;
@@ -246,7 +284,6 @@
 
         modeBtn.addEventListener('pointerdown', handleStart);
         window.addEventListener('pointerup', handleEnd);
-
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
@@ -262,7 +299,6 @@
         window.addEventListener('touchmove', updatePos, { passive: true });
         document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
         document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
-        window.addEventListener('blur', () => cursor.style.opacity = '0');
 
         discordBtn.addEventListener('click', () => {
             navigator.clipboard.writeText('dnka').then(() => {
@@ -282,7 +318,6 @@
                     document.getElementById('main-title').classList.add('moved');
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
-                        document.getElementById('top-bar').style.opacity = '1';
                         animationsStarted = true;
                     }, 1000);
                 }, 800);
@@ -291,8 +326,8 @@
 
         let marqueePos = window.innerWidth;
         function loop() {
-            cursorX += (mouseX - cursorX) * 0.25;
-            cursorY += (mouseY - cursorY) * 0.25;
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
             if (animationsStarted) {
