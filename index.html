@@ -49,7 +49,7 @@
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
             background: #fff; opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
         }
 
         .top-bar {
@@ -58,9 +58,12 @@
             z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; }
+        #marquee-text { 
+            display: inline-block;
+            white-space: nowrap; 
+            will-change: transform; 
+        }
 
-        /* Контейнер для выравнивания заголовка и контента в одну линию */
         .main-wrapper {
             width: 100%;
             max-width: 500px;
@@ -166,7 +169,7 @@
     <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT &nbsp;&nbsp;&nbsp;&nbsp; ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT &nbsp;&nbsp;&nbsp;&nbsp;</div>
     </div>
 
     <div class="main-wrapper">
@@ -239,6 +242,11 @@
         let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
         let galPos = 0, galCurrentSpeed = 0, galTargetSpeed = 0;
         let isMuted = true, animationsStarted = false;
+        
+        // Cursor timeout logic
+        let cursorTimeout;
+        function hideCursor() { cursor.style.opacity = 0; }
+        function showCursor() { cursor.style.opacity = 1; }
 
         // Discord Copy Logic
         document.getElementById('discord-btn').onclick = function() {
@@ -299,11 +307,14 @@
             cursorX += (mouseX - cursorX) * 0.2;
             cursorY += (mouseY - cursorY) * 0.2;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            
             if (animationsStarted) {
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
-                if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
+                // Marquee wrap logic fixed for no gap
+                if (marqueePos < -(marqueeEl.offsetWidth / 2)) marqueePos = 0;
                 marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
                 galPos -= galCurrentSpeed;
                 if (Math.abs(galPos) >= gallery.offsetWidth / 2) galPos = 0;
@@ -314,8 +325,13 @@
 
         window.addEventListener('mousemove', e => { 
             mouseX = e.clientX; mouseY = e.clientY; 
-            cursor.style.opacity = 1; 
+            showCursor();
+            clearTimeout(cursorTimeout);
+            cursorTimeout = setTimeout(hideCursor, 1000);
         });
+
+        window.addEventListener('mouseenter', showCursor);
+        window.addEventListener('mouseleave', hideCursor);
 
         document.getElementById('mute-btn').onclick = function() {
             isMuted = !isMuted;
