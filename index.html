@@ -97,6 +97,7 @@
         
         .location-text { 
             font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
+            font-weight: bold; /* Сделано жирнее */
             color: var(--main-color); transition: color 0.4s ease, opacity 0.5s ease;
             letter-spacing: 0.5px; 
         }
@@ -120,8 +121,12 @@
         }
 
         .gallery-container { overflow: hidden; width: 100%; margin-top: 20px; }
-        .gallery { display: flex; width: max-content; filter: var(--gallery-filter); transition: filter 0.4s ease; }
-        .gallery img { width: 280px; height: auto; }
+        .gallery { 
+            display: flex; width: max-content; 
+            filter: var(--gallery-filter); transition: filter 0.4s ease;
+            font-size: 0; /* Убирает микро-пробелы между inline-элементами */
+        }
+        .gallery img { width: 280px; height: auto; display: block; padding: 0; margin: 0; }
 
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
@@ -152,7 +157,6 @@
         .tooltip-wrapper:hover .tooltip-content { display: block; }
         
         #about-tooltip { left: 0; }
-        /* Теперь выезжает влево */
         #sound-tooltip { right: 0; transform-origin: right; }
 
         @media (min-width: 500px) { .content-fade { align-self: center; } .title-wrapper { left: calc(50% - 230px); } }
@@ -261,7 +265,6 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
-        // Управление видимостью курсора
         const updatePos = (e) => {
             cursor.style.opacity = '1';
             let ev = e.touches ? e.touches[0] : e;
@@ -309,7 +312,6 @@
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
             if (animationsStarted) {
-                // Плавное изменение скорости карусели
                 currentGallerySpeed += (targetGallerySpeed - currentGallerySpeed) * 0.05;
                 galleryPos -= currentGallerySpeed;
                 if (Math.abs(galleryPos) >= gallery.offsetWidth / 2) galleryPos = 0;
