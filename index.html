@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <title>dnka links</title>
     <style>
         :root {
@@ -24,7 +24,7 @@
             box-sizing: border-box; 
             -webkit-user-select: none; 
             user-select: none; 
-            touch-action: none; 
+            touch-action: pan-y; 
         }
 
         @font-face {
@@ -33,14 +33,18 @@
             font-weight: normal; font-style: normal;
         }
 
-        body {
-            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+            overflow: hidden; 
+            position: fixed; 
+            top: 0; left: 0;
             background-color: var(--bg-color);
             color: var(--main-color);
-            margin: 0; height: 100vh; width: 100vw;
-            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+            font-family: 'Bookish Book', Helvetica, Arial, sans-serif;
             transition: background 0.4s ease, color 0.4s ease;
             letter-spacing: var(--base-spacing);
+            display: flex; flex-direction: column; align-items: center;
         }
 
         #custom-cursor {
@@ -49,7 +53,7 @@
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
             background: #fff; opacity: 0;
-            transition: opacity 0.5s ease; /* Плавное исчезновение */
+            transition: opacity 0.5s ease;
             will-change: transform, opacity;
         }
 
@@ -65,9 +69,9 @@
             width: 100%;
             max-width: 500px;
             padding: 0 20px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            position: absolute;
+            top: 0; height: 100%;
+            display: flex; flex-direction: column;
         }
 
         .title-wrapper {
@@ -86,13 +90,13 @@
             font-weight: bold; color: var(--main-color); transition: opacity 0.5s ease, color 0.4s;
         }
 
-        .title-wrapper.moved { top: 40px; transform: translateY(0); }
+        .title-wrapper.moved { top: 40px; transform: translateY(0); position: fixed; }
         .title-wrapper.moved h1 { font-size: 24px; }
         .title-wrapper.moved .location-text { opacity: 1; }
 
         .content-fade {
             opacity: 0; visibility: hidden; transition: 0.8s;
-            margin-top: 110px; /* Увеличен отступ от заголовка */
+            margin-top: 110px; 
             width: 100%;
             display: flex; flex-direction: column;
         }
@@ -106,7 +110,7 @@
 
         .gallery-container { 
             position: relative; width: 100%; height: var(--gallery-height); 
-            margin-top: 35px; /* Увеличен отступ до галереи */
+            margin-top: 35px; 
             overflow: hidden; transition: height 0.3s ease;
         }
         .gallery { display: flex; width: max-content; height: 100%; will-change: transform; }
@@ -133,9 +137,13 @@
             background: var(--btn-bg); color: var(--btn-text); border: none; 
             width: 22px; height: 22px; font-size: 10px; transition: 0.4s;
         }
+        
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
-            color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
+            color: var(--main-color); font-size: 16px; /* Предотвращает зум на iOS */
+            padding: 3px; width: 200%; text-transform: uppercase;
+            border-radius: 0; -webkit-appearance: none;
+            transform: scale(0.5); transform-origin: left center;
         }
 
         .bottom-bar {
@@ -236,6 +244,7 @@
         const marqueeEl = document.getElementById('marquee-text');
         const gallery = document.getElementById('gallery-anim');
         const audio = document.getElementById('bg-music');
+        const bgInput = document.getElementById('bg-input');
 
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
         let marqueePos = 0, marqueeCurrentSpeed = 2, marqueeTargetSpeed = 2;
@@ -243,6 +252,16 @@
         let isMuted = true, animationsStarted = false;
         let cursorActive = false;
         let cursorTimeout;
+
+        // Фикс скролла при взаимодействии с клавиатурой
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => window.scrollTo(0, 0));
+            window.visualViewport.addEventListener('scroll', () => window.scrollTo(0, 0));
+        }
+
+        bgInput.addEventListener('blur', () => {
+            setTimeout(() => window.scrollTo(0, 0), 100);
+        });
 
         // Discord Copy Logic
         document.getElementById('discord-btn').onclick = function() {
@@ -285,7 +304,7 @@
             }
         }
 
-        document.getElementById('bg-input').addEventListener('input', (e) => {
+        bgInput.addEventListener('input', (e) => {
             let bgColor = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
             if (bgColor.length < 4 && bgColor.length !== 7) return;
             root.style.setProperty('--bg-color', bgColor);
@@ -317,22 +336,11 @@
         }
 
         window.addEventListener('mousemove', e => { 
-            // Инициализация позиции при первом движении, чтобы не прыгал из угла
-            if (!cursorActive) {
-                cursorX = e.clientX;
-                cursorY = e.clientY;
-                cursorActive = true;
-            }
-            mouseX = e.clientX; 
-            mouseY = e.clientY; 
-            
+            if (!cursorActive) { cursorX = e.clientX; cursorY = e.clientY; cursorActive = true; }
+            mouseX = e.clientX; mouseY = e.clientY; 
             cursor.style.opacity = 1; 
-            
-            // Сброс таймера исчезновения
             clearTimeout(cursorTimeout);
-            cursorTimeout = setTimeout(() => {
-                cursor.style.opacity = 0;
-            }, 1000);
+            cursorTimeout = setTimeout(() => { cursor.style.opacity = 0; }, 1000);
         });
 
         document.getElementById('mute-btn').onclick = function() {
@@ -378,4 +386,3 @@
     </script>
 </body>
 </html>
-
