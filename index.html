@@ -24,7 +24,8 @@
             width: 100%;
             height: 100%;
             position: fixed;
-            touch-action: none; 
+            touch-action: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         * { 
@@ -39,6 +40,7 @@
             font-family: 'Bookish Book';
             src: url('Bookish-Book.ttf') format('truetype');
             font-weight: normal; font-style: normal;
+            font-display: swap;
         }
 
         body {
@@ -49,8 +51,7 @@
             display: flex; flex-direction: column; align-items: center;
             transition: background 0.4s ease, color 0.4s ease;
             letter-spacing: var(--base-spacing);
-            /* Создаем контекст наложения, чтобы mix-blend-mode работал корректно */
-            isolation: isolate; 
+            isolation: isolate; /* Критично для корректной инверсии курсора */
         }
 
         #custom-cursor {
@@ -58,24 +59,23 @@
             height: 8px; 
             border-radius: 50%;
             position: fixed; 
-            top: 0; 
-            left: 0;
+            top: 0; left: 0;
             pointer-events: none; 
             z-index: 9999999;
             background-color: #ffffff !important; 
             mix-blend-mode: difference;
             opacity: 0;
-            transition: opacity 0.5s ease;
-            will-change: transform, opacity;
+            transition: opacity 0.3s ease;
+            will-change: transform;
         }
 
         .top-bar {
             background: var(--top-bar-bg); color: var(--top-bar-text); font-size: 10px; height: 22px;
             display: flex; align-items: center; position: fixed; top: 0; width: 100%;
-            z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s, background 0.4s, color 0.4s;
+            z-index: 100; overflow: hidden; opacity: 0; transition: opacity 0.5s;
         }
 
-        #marquee-text { white-space: nowrap; will-change: transform; }
+        #marquee-text { white-space: nowrap; will-change: transform; display: inline-block; }
 
         .main-wrapper {
             width: 100%;
@@ -100,7 +100,7 @@
 
         .location-text { 
             font-size: 9.5px; text-transform: uppercase; margin-top: 1px; opacity: 0; 
-            font-weight: bold; color: var(--main-color); transition: opacity 0.5s ease, color 0.4s;
+            font-weight: bold; color: var(--main-color); transition: opacity 0.5s ease;
         }
 
         .title-wrapper.moved { top: 40px; transform: translateY(0); }
@@ -119,7 +119,6 @@
             display: block; font-weight: bold; font-size: 13px; text-transform: uppercase;
             color: var(--main-color); text-decoration: none; margin-bottom: 5px; padding: 8px 0;
             border-bottom: 1px solid var(--main-color); transition: 0.4s ease;
-            position: relative;
         }
 
         .gallery-container { 
@@ -148,12 +147,12 @@
         .acc-btns { display: flex; gap: 3px; }
         .acc-btns button { 
             background: var(--btn-bg); color: var(--btn-text); border: none; 
-            width: 22px; height: 22px; font-size: 10px; transition: 0.4s;
+            width: 22px; height: 22px; font-size: 10px; transition: 0.2s;
         }
         .acc-input {
             background: transparent; border: 1px solid var(--main-color);
             color: var(--main-color); font-size: 8px; padding: 3px; width: 100%; text-transform: uppercase;
-            -webkit-user-select: text; user-select: text;
+            -webkit-user-select: text; user-select: text; outline: none;
         }
 
         .bottom-bar {
@@ -167,7 +166,6 @@
             padding: 8px 12px; height: var(--btn-size);
             font-family: 'Bookish Book', sans-serif; font-size: var(--btn-font-size);
             text-transform: uppercase; transition: 0.4s ease; display: flex; align-items: center; justify-content: center;
-            position: relative;
         }
 
         .square-btn { width: var(--btn-size); min-width: var(--btn-size); padding: 0 !important; }
@@ -184,10 +182,10 @@
 </head>
 <body oncontextmenu="return false;">
     <div id="custom-cursor"></div>
-    <audio id="bg-music" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <audio id="bg-music" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
 
     <div class="top-bar" id="top-bar">
-        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT</div>
+        <div id="marquee-text">ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT — </div>
     </div>
 
     <div class="main-wrapper">
@@ -209,7 +207,7 @@
                     <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png"><img src="6.png"><img src="7.png">
                 </div>
             </div>
-            <div style="font-size: 8px; margin-top: 5px; opacity: 0.7;">© 2026 DNKA. ALL RIGHTS RESERVED.</div>
+            <div style="font-size: 8px; margin-top: 5px; opacity: 0.7; pointer-events: none;">© 2026 DNKA. ALL RIGHTS RESERVED.</div>
         </div>
     </div>
 
@@ -221,7 +219,7 @@
             <div class="acc-item"><span class="acc-label">Gal Size</span><div class="acc-btns"><button onclick="changeSize('gal', 20)">+</button><button onclick="changeSize('gal', -20)">-</button></div></div>
             <div class="acc-item" style="grid-column: span 2;">
                 <span class="acc-label">BG HEX</span>
-                <input type="text" class="acc-input" placeholder="#FFFFFF" id="bg-input">
+                <input type="text" class="acc-input" placeholder="#FFFFFF" id="bg-input" maxlength="7">
             </div>
         </div>
         <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px;">
@@ -264,16 +262,16 @@
         let cursorActive = false;
         let cursorTimeout;
 
-        bgInput.addEventListener('blur', () => { window.scrollTo(0, 0); document.body.scrollTop = 0; });
-
-        document.getElementById('discord-btn').onclick = function() {
+        // Копирование Discord
+        document.getElementById('discord-btn').addEventListener('click', function() {
             const originalText = this.innerText;
             navigator.clipboard.writeText('dnka').then(() => {
                 this.innerText = 'COPIED!';
                 setTimeout(() => { this.innerText = originalText; }, 1000);
             });
-        };
+        });
 
+        // Управление бегущей строкой
         const topBar = document.getElementById('top-bar');
         ['mousedown', 'touchstart'].forEach(e => topBar.addEventListener(e, () => marqueeTargetSpeed = 0));
         ['mouseup', 'touchend', 'mouseleave'].forEach(e => topBar.addEventListener(e, () => marqueeTargetSpeed = 2));
@@ -281,92 +279,105 @@
         function getContrastYIQ(hexcolor){
             hexcolor = hexcolor.replace("#", "");
             if(hexcolor.length === 3) hexcolor = hexcolor.split('').map(s => s + s).join('');
-            var r = parseInt(hexcolor.substr(0,2),16);
-            var g = parseInt(hexcolor.substr(2,2),16);
-            var b = parseInt(hexcolor.substr(4,2),16);
-            var yiq = ((r*299)+(g*587)+(b*114))/1000;
-            return (yiq >= 128) ? '#000000' : '#ffffff';
+            const r = parseInt(hexcolor.substr(0,2),16), g = parseInt(hexcolor.substr(2,2),16), b = parseInt(hexcolor.substr(4,2),16);
+            return (((r*299)+(g*587)+(b*114))/1000 >= 128) ? '#000000' : '#ffffff';
         }
 
         function changeSize(type, delta) {
             if (type === 'text') {
-                let current = parseInt(window.getComputedStyle(document.querySelector('.link-text')).fontSize);
-                document.querySelectorAll('.link-text').forEach(el => el.style.fontSize = (current + delta) + 'px');
+                const el = document.querySelector('.link-text');
+                const current = parseInt(window.getComputedStyle(el).fontSize);
+                document.querySelectorAll('.link-text').forEach(e => e.style.fontSize = (current + delta) + 'px');
             } else if (type === 'btn') {
-                let currentSize = parseInt(root.style.getPropertyValue('--btn-size') || 28);
-                let currentFont = parseFloat(root.style.getPropertyValue('--btn-font-size') || 10);
-                root.style.setProperty('--btn-size', (currentSize + delta) + 'px');
-                root.style.setProperty('--btn-font-size', (currentFont + delta/4) + 'px');
+                const curS = parseInt(getComputedStyle(root).getPropertyValue('--btn-size'));
+                const curF = parseFloat(getComputedStyle(root).getPropertyValue('--btn-font-size'));
+                root.style.setProperty('--btn-size', (curS + delta) + 'px');
+                root.style.setProperty('--btn-font-size', (curF + delta/4) + 'px');
             } else if (type === 'space') {
-                let current = parseFloat(root.style.getPropertyValue('--base-spacing') || 0.2);
-                root.style.setProperty('--base-spacing', (current + delta) + 'px');
+                const cur = parseFloat(getComputedStyle(root).getPropertyValue('--base-spacing'));
+                root.style.setProperty('--base-spacing', (cur + delta) + 'px');
             } else if (type === 'gal') {
-                let current = parseInt(root.style.getPropertyValue('--gallery-height') || 200);
-                root.style.setProperty('--gallery-height', Math.max(50, current + delta) + 'px');
+                const cur = parseInt(getComputedStyle(root).getPropertyValue('--gallery-height'));
+                root.style.setProperty('--gallery-height', Math.max(50, cur + delta) + 'px');
             }
         }
 
         bgInput.addEventListener('input', (e) => {
-            let bgColor = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
-            if (bgColor.length < 4 && bgColor.length !== 7) return;
-            root.style.setProperty('--bg-color', bgColor);
-            let adaptiveText = getContrastYIQ(bgColor);
-            root.style.setProperty('--main-color', adaptiveText);
-            root.style.setProperty('--btn-bg', adaptiveText);
-            root.style.setProperty('--btn-text', bgColor);
-            root.style.setProperty('--top-bar-bg', adaptiveText);
-            root.style.setProperty('--top-bar-text', bgColor);
+            let val = e.target.value;
+            if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+            if (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(val)) {
+                root.style.setProperty('--bg-color', val);
+                const contrast = getContrastYIQ(val);
+                root.style.setProperty('--main-color', contrast);
+                root.style.setProperty('--btn-bg', contrast);
+                root.style.setProperty('--btn-text', val);
+                root.style.setProperty('--top-bar-bg', contrast);
+                root.style.setProperty('--top-bar-text', val);
+            }
         });
 
-        function loop() {
+        function animate() {
+            // LERP для плавного курсора
             cursorX += (mouseX - cursorX) * 0.15;
             cursorY += (mouseY - cursorY) * 0.15;
             cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
             
             if (animationsStarted) {
+                // Масштабируемая бегущая строка
                 marqueeCurrentSpeed += (marqueeTargetSpeed - marqueeCurrentSpeed) * 0.08;
                 marqueePos -= marqueeCurrentSpeed;
                 if (marqueePos < -marqueeEl.offsetWidth) marqueePos = window.innerWidth;
-                marqueeEl.style.transform = `translateX(${marqueePos}px)`;
+                marqueeEl.style.transform = `translate3d(${marqueePos}px, 0, 0)`;
                 
+                // Плавная галерея
                 galCurrentSpeed += (galTargetSpeed - galCurrentSpeed) * 0.05;
                 galPos -= galCurrentSpeed;
                 if (Math.abs(galPos) >= gallery.offsetWidth / 2) galPos = 0;
-                gallery.style.transform = `translateX(${galPos}px)`;
+                gallery.style.transform = `translate3d(${galPos}px, 0, 0)`;
             }
-            requestAnimationFrame(loop);
+            requestAnimationFrame(animate);
         }
 
         const updateCoords = (e) => {
-            let x = e.clientX || (e.touches && e.touches[0].clientX);
-            let y = e.clientY || (e.touches && e.touches[0].clientY);
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
             if (x !== undefined) {
                 mouseX = x; mouseY = y;
+                if (!cursorActive) { cursorX = mouseX; cursorY = mouseY; cursorActive = true; }
                 cursor.style.opacity = 1; 
                 clearTimeout(cursorTimeout);
                 cursorTimeout = setTimeout(() => { cursor.style.opacity = 0; }, 1000);
             }
         };
 
-        window.addEventListener('mousemove', updateCoords);
-        window.addEventListener('touchstart', updateCoords);
-        window.addEventListener('touchmove', updateCoords);
+        window.addEventListener('mousemove', updateCoords, {passive: true});
+        window.addEventListener('touchstart', updateCoords, {passive: true});
+        window.addEventListener('touchmove', updateCoords, {passive: true});
 
         document.getElementById('mute-btn').onclick = function() {
             isMuted = !isMuted;
-            if(!isMuted) { audio.play(); this.innerText = "[ SOUND: ON ]"; galTargetSpeed = 1.2; }
-            else { audio.pause(); this.innerText = "[ SOUND: OFF ]"; galTargetSpeed = 0; }
+            if(!isMuted) { 
+                audio.play().catch(() => {}); 
+                this.innerText = "[ SOUND: ON ]"; 
+                galTargetSpeed = 1.2; 
+            } else { 
+                audio.pause(); 
+                this.innerText = "[ SOUND: OFF ]"; 
+                galTargetSpeed = 0; 
+            }
         };
 
         document.getElementById('theme-btn').onclick = () => {
-            let currentBg = getComputedStyle(root).getPropertyValue('--bg-color').trim();
-            let newBg = (currentBg === '#ffffff' || currentBg === 'rgb(255, 255, 255)') ? '#000000' : '#ffffff';
+            const cur = getComputedStyle(root).getPropertyValue('--bg-color').trim().toLowerCase();
+            const isWhite = (cur === '#ffffff' || cur === 'rgb(255, 255, 255)');
+            const newBg = isWhite ? '#000000' : '#ffffff';
+            const contrast = isWhite ? '#ffffff' : '#000000';
+            
             root.style.setProperty('--bg-color', newBg);
-            let adaptiveText = getContrastYIQ(newBg);
-            root.style.setProperty('--main-color', adaptiveText);
-            root.style.setProperty('--btn-bg', adaptiveText);
+            root.style.setProperty('--main-color', contrast);
+            root.style.setProperty('--btn-bg', contrast);
             root.style.setProperty('--btn-text', newBg);
-            root.style.setProperty('--top-bar-bg', adaptiveText);
+            root.style.setProperty('--top-bar-bg', contrast);
             root.style.setProperty('--top-bar-text', newBg);
         };
 
@@ -377,8 +388,9 @@
             const text = "HELLO, IM DNKA!";
             let i = 0;
             const type = setInterval(() => {
-                if(i < text.length) document.getElementById('typewriter').textContent += text[i++];
-                else {
+                if(i < text.length) {
+                    document.getElementById('typewriter').textContent += text[i++];
+                } else {
                     clearInterval(type);
                     setTimeout(() => {
                         document.getElementById('main-title').classList.add('moved');
@@ -386,11 +398,11 @@
                             document.getElementById('main-content').classList.add('visible');
                             document.getElementById('top-bar').style.opacity = 1;
                             animationsStarted = true;
-                        }, 1000);
-                    }, 1500);
+                        }, 800);
+                    }, 1000);
                 }
-            }, 120);
-            loop();
+            }, 100);
+            animate();
         };
     </script>
 </body>
