@@ -67,7 +67,7 @@
             position: fixed; top: 0; left: 0;
             pointer-events: none; z-index: 999999;
             mix-blend-mode: difference;
-            background: #fff; opacity: 0; /* Изначально скрыт */
+            background: #fff; opacity: 0;
             will-change: transform, opacity;
             transition: opacity 0.3s ease;
         }
@@ -126,7 +126,13 @@
             filter: var(--gallery-filter); transition: filter 0.4s ease;
             font-size: 0; 
         }
-        .gallery img { width: 280px; height: auto; display: block; padding: 0; margin: 0; }
+        .gallery img { 
+            width: 280px; 
+            height: auto; 
+            display: block; 
+            padding: 0; 
+            margin: 0 -1px; /* Убирает просветы и создает микро-наложение */
+        }
 
         .copyright { 
             font-size: 8px; text-transform: uppercase; color: var(--main-color); 
@@ -224,7 +230,7 @@
         let cursorX = mouseX, cursorY = mouseY, animationsStarted = false;
         
         let idleTimer;
-        let canShowCursor = false; // Блокировка показа до конца анимации
+        let canShowCursor = false; 
 
         const phrases = ["ALL BUTTONS CLICKABLE / HOLD TO STOP TEXT", "DM ME FOR ADS/SONG - @EELEVEX (4FREE)"];
         let currentPhraseIdx = 0, marqueeCurrentSpeed = 2.0, marqueeTargetSpeed = 2.0;
@@ -268,10 +274,9 @@
         topBar.addEventListener('pointerdown', () => marqueeTargetSpeed = 0);
         window.addEventListener('pointerup', () => marqueeTargetSpeed = 2.0);
 
-        // Логика курсора
         const hideCursor = () => { cursor.style.opacity = '0'; };
         const resetIdleTimer = () => {
-            if (!canShowCursor) return; // Не показываем, пока текст не на месте
+            if (!canShowCursor) return;
             cursor.style.opacity = '1';
             clearTimeout(idleTimer);
             idleTimer = setTimeout(hideCursor, 600); // 0.6 сек
@@ -311,12 +316,11 @@
                     typewriterTitle.classList.remove('blink');
                     document.getElementById('main-title').classList.add('moved');
                     
-                    // Когда текст "встал на место":
                     setTimeout(() => {
                         document.getElementById('main-content').classList.add('visible');
                         topBar.style.opacity = '1';
                         animationsStarted = true;
-                        canShowCursor = true; // РАЗРЕШАЕМ ПОКАЗ КУРСОРA
+                        canShowCursor = true; 
                     }, 1000);
                 }, 2000);
             }
