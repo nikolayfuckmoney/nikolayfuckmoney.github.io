@@ -27,10 +27,9 @@
             cursor: none;
         }
 
-        /* Кастомный курсор (уменьшенный) */
         #cursor {
             position: fixed;
-            width: 8px; /* Сделал меньше */
+            width: 8px;
             height: 8px;
             background-color: white; 
             border-radius: 50%;
@@ -98,16 +97,16 @@
             cursor: none;
             -webkit-tap-highlight-color: transparent;
             display: inline-block;
-            border-bottom: 1px solid transparent; /* Заготовка под подчеркивание */
+            border-bottom: 1px solid transparent;
             transition: border-color 0.2s ease;
         }
 
-        /* Вместо прозрачности — подчеркивание */
         .social-link:hover, .email-link:hover {
             border-color: black;
         }
 
-        #discord-btn { min-width: 60px; }
+        /* Убрал min-width, теперь она как все */
+        #discord-btn { min-width: 0; }
         .email-link { margin-top: 5px; }
 
         .f1 { font-family: 'CustomFont1', sans-serif; }
@@ -160,7 +159,6 @@
             setTimeout(animate, typeSpeed);
         }
 
-        // Логика курсора без прыжков
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0;
         let cursorX = 0, cursorY = 0;
@@ -178,7 +176,7 @@
             mouseX = x;
             mouseY = y;
             if (firstMove) {
-                cursorX = mouseX; // Мгновенный спавн в точке
+                cursorX = mouseX;
                 cursorY = mouseY;
                 firstMove = false;
                 cursor.style.opacity = "1";
@@ -188,7 +186,7 @@
         document.addEventListener('mouseenter', () => { cursor.style.opacity = "1"; });
         document.addEventListener('mouseleave', () => { 
             cursor.style.opacity = "0"; 
-            firstMove = true; // Сбрасываем, чтобы при следующем входе он снова спавнился на месте
+            firstMove = true; 
         });
 
         document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
