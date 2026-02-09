@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka</title>
     <style>
-        /* Подключение шрифтов */
         @font-face { font-family: 'CustomFont1'; src: url('1.ttf') format('truetype'); }
         @font-face { font-family: 'CustomFont2'; src: url('2.otf') format('opentype'); }
         @font-face { font-family: 'CustomFont3'; src: url('3.ttf') format('truetype'); }
@@ -25,6 +24,23 @@
             touch-action: none; 
             -webkit-user-select: none;
             user-select: none;
+            cursor: none;
+        }
+
+        /* Кастомный курсор (уменьшенный) */
+        #cursor {
+            position: fixed;
+            width: 8px; /* Сделал меньше */
+            height: 8px;
+            background-color: white; 
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+            will-change: transform, opacity;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .main-container {
@@ -49,7 +65,6 @@
             width: 100%;
             aspect-ratio: 1 / 1;
             overflow: hidden;
-            border-radius: 0;
             margin-bottom: 20px;
         }
 
@@ -70,7 +85,7 @@
 
         .social-row {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-start;
             flex-wrap: wrap;
         }
@@ -80,22 +95,21 @@
             color: black;
             font-family: 'CustomFont1', sans-serif;
             font-size: 14px;
-            transition: opacity 0.2s;
-            cursor: pointer;
+            cursor: none;
             -webkit-tap-highlight-color: transparent;
             display: inline-block;
+            border-bottom: 1px solid transparent; /* Заготовка под подчеркивание */
+            transition: border-color 0.2s ease;
         }
 
-        /* Исправление для кнопки Discord: резервируем место под текст */
-        #discord-btn {
-            min-width: 65px; /* Резервируем место, чтобы текст не прыгал */
-            text-align: left;
+        /* Вместо прозрачности — подчеркивание */
+        .social-link:hover, .email-link:hover {
+            border-color: black;
         }
 
-        .social-link:hover, .email-link:hover { opacity: 0.5; }
+        #discord-btn { min-width: 60px; }
         .email-link { margin-top: 5px; }
 
-        /* Анимация шрифтов лого */
         .f1 { font-family: 'CustomFont1', sans-serif; }
         .f2 { font-family: 'CustomFont2', serif; }
         .f3 { font-family: 'CustomFont3', monospace; }
@@ -106,13 +120,13 @@
 </head>
 <body oncontextmenu="return false;">
 
+    <div id="cursor"></div>
+
     <div class="main-container">
         <div id="typewriter" class="f1"></div>
-
         <div class="photo-wrapper">
             <img src="1.png" alt="dnka">
         </div>
-
         <div class="links-container">
             <div class="social-row">
                 <a href="https://instagram.com/ogdnka" class="social-link">inst</a>
@@ -146,23 +160,50 @@
             setTimeout(animate, typeSpeed);
         }
 
+        // Логика курсора без прыжков
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let firstMove = true;
+
+        function lerp() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(lerp);
+        }
+
+        const updatePosition = (x, y) => {
+            mouseX = x;
+            mouseY = y;
+            if (firstMove) {
+                cursorX = mouseX; // Мгновенный спавн в точке
+                cursorY = mouseY;
+                firstMove = false;
+                cursor.style.opacity = "1";
+            }
+        };
+
+        document.addEventListener('mouseenter', () => { cursor.style.opacity = "1"; });
+        document.addEventListener('mouseleave', () => { 
+            cursor.style.opacity = "0"; 
+            firstMove = true; // Сбрасываем, чтобы при следующем входе он снова спавнился на месте
+        });
+
+        document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
+        document.addEventListener('touchstart', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+        document.addEventListener('touchmove', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+
         const discordBtn = document.getElementById('discord-btn');
-        // Используем 'pointerdown' для мгновенного срабатывания на телефонах
         discordBtn.addEventListener('pointerdown', function(e) {
-            e.preventDefault();
-            const copyText = "dnka";
-            
-            navigator.clipboard.writeText(copyText).then(() => {
+            navigator.clipboard.writeText("dnka").then(() => {
                 const originalText = "discord";
                 discordBtn.textContent = "copied!";
-                
-                setTimeout(() => {
-                    discordBtn.textContent = originalText;
-                }, 1000);
+                setTimeout(() => { discordBtn.textContent = originalText; }, 1000);
             });
         });
 
-        // Блокировка зума и жестов
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
@@ -171,7 +212,7 @@
             lastTouchEnd = now;
         }, false);
 
-        window.onload = animate;
+        window.onload = () => { animate(); lerp(); };
     </script>
 </body>
 </html>
