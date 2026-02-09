@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico?v=2" type="image/x-icon">
     
     <style>
         /* Подключение шрифтов */
@@ -27,10 +27,10 @@
             touch-action: none; 
             -webkit-user-select: none;
             user-select: none;
-            cursor: none; /* Скрываем дефолтный курсор */
+            cursor: none; /* Прячем системный курсор */
         }
 
-        /* Кастомный курсор */
+        /* Кастомный умный курсор */
         #cursor {
             position: fixed;
             width: 8px;
@@ -88,7 +88,7 @@
 
         .social-row {
             display: flex;
-            gap: 8px;
+            gap: 8px; /* Уплотненный отступ */
             justify-content: flex-start;
             flex-wrap: wrap;
         }
@@ -105,12 +105,11 @@
             transition: border-color 0.2s ease;
         }
 
-        /* Эффект подчеркивания при наведении */
+        /* Только подчеркивание при наведении, без изменения прозрачности */
         .social-link:hover, .email-link:hover {
             border-color: black;
         }
 
-        /* Кнопка Discord теперь без лишних отступов */
         #discord-btn { min-width: 0; }
         .email-link { margin-top: 5px; }
 
@@ -146,7 +145,7 @@
     </div>
 
     <script>
-        // Анимация текста
+        // Анимация печати текста
         const text = "dnka";
         const typewriter = document.getElementById('typewriter');
         const fontClasses = ['f1', 'f2', 'f3'];
@@ -167,7 +166,7 @@
             setTimeout(animate, typeSpeed);
         }
 
-        // Логика курсора
+        // Логика кастомного курсора
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0;
         let cursorX = 0, cursorY = 0;
@@ -202,7 +201,7 @@
         document.addEventListener('touchstart', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
         document.addEventListener('touchmove', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
-        // Копирование Discord
+        // Копирование Discord ника
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('pointerdown', function(e) {
             navigator.clipboard.writeText("dnka").then(() => {
@@ -212,7 +211,7 @@
             });
         });
 
-        // Блокировка стандартных жестов
+        // Блокировка системного зума
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
