@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
     <style>
+        /* Подключение шрифтов */
         @font-face { font-family: 'CustomFont1'; src: url('1.ttf') format('truetype'); }
         @font-face { font-family: 'CustomFont2'; src: url('2.otf') format('opentype'); }
         @font-face { font-family: 'CustomFont3'; src: url('3.ttf') format('truetype'); }
@@ -24,9 +27,10 @@
             touch-action: none; 
             -webkit-user-select: none;
             user-select: none;
-            cursor: none;
+            cursor: none; /* Скрываем дефолтный курсор */
         }
 
+        /* Кастомный курсор */
         #cursor {
             position: fixed;
             width: 8px;
@@ -101,11 +105,12 @@
             transition: border-color 0.2s ease;
         }
 
+        /* Эффект подчеркивания при наведении */
         .social-link:hover, .email-link:hover {
             border-color: black;
         }
 
-        /* Убрал min-width, теперь она как все */
+        /* Кнопка Discord теперь без лишних отступов */
         #discord-btn { min-width: 0; }
         .email-link { margin-top: 5px; }
 
@@ -123,9 +128,11 @@
 
     <div class="main-container">
         <div id="typewriter" class="f1"></div>
+
         <div class="photo-wrapper">
             <img src="1.png" alt="dnka">
         </div>
+
         <div class="links-container">
             <div class="social-row">
                 <a href="https://instagram.com/ogdnka" class="social-link">inst</a>
@@ -139,6 +146,7 @@
     </div>
 
     <script>
+        // Анимация текста
         const text = "dnka";
         const typewriter = document.getElementById('typewriter');
         const fontClasses = ['f1', 'f2', 'f3'];
@@ -159,6 +167,7 @@
             setTimeout(animate, typeSpeed);
         }
 
+        // Логика курсора
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0;
         let cursorX = 0, cursorY = 0;
@@ -193,6 +202,7 @@
         document.addEventListener('touchstart', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
         document.addEventListener('touchmove', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
+        // Копирование Discord
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('pointerdown', function(e) {
             navigator.clipboard.writeText("dnka").then(() => {
@@ -202,6 +212,7 @@
             });
         });
 
+        // Блокировка стандартных жестов
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
