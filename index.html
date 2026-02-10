@@ -7,7 +7,6 @@
     <link rel="icon" href="favicon.ico?v=2" type="image/x-icon">
     
     <style>
-        /* Подключение шрифтов */
         @font-face { font-family: 'CustomFont1'; src: url('1.ttf') format('truetype'); }
         @font-face { font-family: 'CustomFont2'; src: url('2.otf') format('opentype'); }
         @font-face { font-family: 'CustomFont3'; src: url('3.ttf') format('truetype'); }
@@ -16,7 +15,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: white;
+            background-color: #fdfdfd;
             overflow: hidden; 
             position: fixed;
             width: 100%;
@@ -30,15 +29,35 @@
             cursor: none;
         }
 
+        body::before {
+            content: "";
+            position: fixed;
+            top: -100%; left: -100%;
+            width: 300%; height: 300%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 10000;
+            animation: noise 8s steps(10) infinite;
+        }
+
+        @keyframes noise {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -10%); }
+            50% { transform: translate(-10%, 10%); }
+        }
+
         #cursor {
             position: fixed;
             width: 8px;
             height: 8px;
-            background-color: white; 
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            border: 0.5px solid rgba(0, 0, 0, 0.8);
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
-            mix-blend-mode: difference;
             transform: translate(-50%, -50%);
             will-change: transform, opacity;
             opacity: 0;
@@ -49,8 +68,25 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            width: 90vw;
+            width: 85vw;
             max-width: 450px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+            transition: filter 0.4s ease, opacity 0.4s ease;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        body:has(.social-link:hover) #typewriter,
+        body:has(.social-link:hover) .photo-wrapper,
+        body:has(.email-link:hover) #typewriter,
+        body:has(.email-link:hover) .photo-wrapper {
+            filter: blur(5px) grayscale(0.5);
+            opacity: 0.4;
+        }
+
+        #typewriter, .photo-wrapper {
+            transition: filter 0.5s ease, opacity 0.5s ease;
         }
 
         #typewriter {
@@ -68,6 +104,8 @@
             aspect-ratio: 1 / 1;
             overflow: hidden;
             margin-bottom: 20px;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         }
 
         .photo-wrapper img {
@@ -83,13 +121,16 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 12px;
+            z-index: 100;
         }
 
         .social-row {
             display: flex;
-            gap: 8px;
+            flex-direction: row; /* Возвращено в ряд */
+            gap: 12px;
             justify-content: flex-start;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .social-link, .email-link {
@@ -99,16 +140,44 @@
             font-size: 14px;
             cursor: none;
             -webkit-tap-highlight-color: transparent;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             border-bottom: 1px solid transparent;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        /* Выезжающий текст без скобок, тем же шрифтом */
+        .social-link::after {
+            content: attr(data-info);
+            margin-left: 0px;
+            width: 0;
+            display: inline-block;
+            overflow: hidden;
+            color: #aaa;
+            font-family: 'CustomFont1', sans-serif;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .social-link:hover::after {
+            width: auto;
+            margin-left: 6px;
+            opacity: 1;
+        }
+
+        .links-container:hover .social-link:not(:hover),
+        .links-container:hover .email-link:not(:hover) {
+            opacity: 0.3;
+            filter: blur(1px);
         }
 
         .social-link:hover, .email-link:hover {
             border-color: black;
         }
 
-        #discord-btn { min-width: 0; cursor: pointer; }
         .email-link { margin-top: 5px; }
 
         .f1 { font-family: 'CustomFont1', sans-serif; }
@@ -132,11 +201,11 @@
 
         <div class="links-container">
             <div class="social-row">
-                <a href="https://instagram.com/ogdnka" class="social-link">inst</a>
-                <a href="https://t.me/eeleve" class="social-link">telegram</a>
-                <a id="discord-btn" class="social-link">discord</a>
-                <a href="https://twitch.tv/ogdnka" class="social-link">twitch</a>
-                <a href="https://tiktok.com/@dnkanle" class="social-link">tiktok</a>
+                <a href="https://instagram.com/ogdnka" class="social-link" data-info="@ogdnka">inst</a>
+                <a href="https://t.me/eeleve" class="social-link" data-info="tgk: 11">telegram</a>
+                <a id="discord-btn" class="social-link" data-info="@dnka">discord</a>
+                <a href="https://twitch.tv/ogdnka" class="social-link" data-info="@ogdnka">twitch</a>
+                <a href="https://tiktok.com/@dnkanle" class="social-link" data-info="@dnkanle">tiktok</a>
             </div>
             <a href="mailto:ogdnka@gmail.com" class="email-link">ogdnka@gmail.com</a>
         </div>
@@ -164,9 +233,7 @@
         }
 
         const cursor = document.getElementById('cursor');
-        let mouseX = 0, mouseY = 0;
-        let cursorX = 0, cursorY = 0;
-        let firstMove = true;
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, firstMove = true;
 
         function lerp() {
             cursorX += (mouseX - cursorX) * 0.15;
@@ -177,48 +244,20 @@
         }
 
         const updatePosition = (x, y) => {
-            mouseX = x;
-            mouseY = y;
-            if (firstMove) {
-                cursorX = mouseX;
-                cursorY = mouseY;
-                firstMove = false;
-                cursor.style.opacity = "1";
-            }
+            mouseX = x; mouseY = y;
+            if (firstMove) { cursorX = mouseX; cursorY = mouseY; firstMove = false; cursor.style.opacity = "1"; }
         };
 
-        document.addEventListener('mouseenter', () => { if (!window.matchMedia("(pointer: coarse)").matches) cursor.style.opacity = "1"; });
-        document.addEventListener('mouseleave', () => { cursor.style.opacity = "0"; firstMove = true; });
-
         document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
-        document.addEventListener('touchstart', (e) => {
-            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-            cursor.style.opacity = "0"; // Скрываем кастомный курсор на тач-устройствах
-        }, { passive: true });
+        document.addEventListener('touchstart', (e) => { cursor.style.opacity = "0"; }, { passive: true });
 
-        // Исправленный блок для Discord
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            const originalText = "discord";
-            
             navigator.clipboard.writeText("dnka").then(() => {
-                discordBtn.textContent = "copied!";
-                setTimeout(() => { discordBtn.textContent = originalText; }, 1000);
-            }).catch(err => {
-                // Фолбек на случай ограничений браузера
-                const textArea = document.createElement("textarea");
-                textArea.value = "dnka";
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    discordBtn.textContent = "copied!";
-                } catch (err) {
-                    discordBtn.textContent = "error";
-                }
-                document.body.removeChild(textArea);
-                setTimeout(() => { discordBtn.textContent = originalText; }, 1000);
+                const originalInfo = discordBtn.getAttribute('data-info');
+                discordBtn.setAttribute('data-info', "copied!");
+                setTimeout(() => { discordBtn.setAttribute('data-info', originalInfo); }, 1500);
             });
         });
 
