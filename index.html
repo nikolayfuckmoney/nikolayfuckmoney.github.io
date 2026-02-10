@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>dnka (links)</title>
-    <link rel="icon" href="favicon.ico?v=2" type="image/x-icon">
+    <link rel="icon" href="favicon.png?v=5" type="image/png">
     
     <style>
+        /* Подключение шрифтов */
         @font-face { font-family: 'CustomFont1'; src: url('1.ttf') format('truetype'); }
         @font-face { font-family: 'CustomFont2'; src: url('2.otf') format('opentype'); }
         @font-face { font-family: 'CustomFont3'; src: url('3.ttf') format('truetype'); }
@@ -15,7 +16,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #fdfdfd;
+            background-color: white;
             overflow: hidden; 
             position: fixed;
             width: 100%;
@@ -23,71 +24,34 @@
             justify-content: center;
             align-items: center; 
             font-family: sans-serif;
-            touch-action: pan-y; 
+            touch-action: none; 
             -webkit-user-select: none;
             user-select: none;
-            cursor: none;
+            cursor: none; /* Прячем системный курсор */
         }
 
-        body::before {
-            content: "";
-            position: fixed;
-            top: -100%; left: -100%;
-            width: 300%; height: 300%;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.04;
-            pointer-events: none;
-            z-index: 10000;
-            animation: noise 8s steps(10) infinite;
-        }
-
-        @keyframes noise {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-5%, -10%); }
-            50% { transform: translate(-10%, 10%); }
-        }
-
+        /* Кастомный умный курсор */
         #cursor {
             position: fixed;
             width: 8px;
             height: 8px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            border: 0.5px solid rgba(0, 0, 0, 0.8);
+            background-color: white; 
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
+            mix-blend-mode: difference;
             transform: translate(-50%, -50%);
             will-change: transform, opacity;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
         }
 
         .main-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            width: 85vw;
+            align-items: flex-start;
+            width: 90vw;
             max-width: 450px;
-            opacity: 0;
-            animation: fadeIn 1.5s ease forwards;
-            transition: filter 0.4s ease, opacity 0.4s ease;
-        }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* Эффект блюра при фокусе на ссылках */
-        body:has(.active-link) #typewriter,
-        body:has(.active-link) .photo-wrapper,
-        body:has(.social-link:hover) #typewriter,
-        body:has(.social-link:hover) .photo-wrapper {
-            filter: blur(5px) grayscale(0.5);
-            opacity: 0.4;
-        }
-
-        #typewriter, .photo-wrapper {
-            transition: filter 0.5s ease, opacity 0.5s ease;
         }
 
         #typewriter {
@@ -105,8 +69,6 @@
             aspect-ratio: 1 / 1;
             overflow: hidden;
             margin-bottom: 20px;
-            border-radius: 0;
-            box-shadow: none;
         }
 
         .photo-wrapper img {
@@ -120,19 +82,15 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            z-index: 1001; /* Выше шума */
+            align-items: flex-start;
+            gap: 12px;
         }
 
         .social-row {
             display: flex;
-            flex-direction: row;
-            justify-content: center;
+            gap: 8px; /* Уплотненный отступ */
+            justify-content: flex-start;
             flex-wrap: wrap;
-            width: 100%;
-            align-items: center;
-            row-gap: 8px; /* Зазор при переносе строк */
         }
 
         .social-link, .email-link {
@@ -142,55 +100,17 @@
             font-size: 14px;
             cursor: none;
             -webkit-tap-highlight-color: transparent;
-            display: inline-flex;
-            align-items: center;
-            border-bottom: 1px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            white-space: nowrap;
-            padding: 2px 0;
-        }
-
-        /* Разделитель как отдельный элемент для надежности клика */
-        .divider {
-            color: black;
-            margin: 0 12px;
-            user-select: none;
-            pointer-events: none;
-        }
-
-        .social-link::after {
-            content: attr(data-info);
-            margin-left: 0px;
-            width: 0;
             display: inline-block;
-            overflow: hidden;
-            color: #aaa;
-            font-family: 'CustomFont1', sans-serif;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
         }
 
-        /* Состояние активации (hover или активный тап) */
-        .social-link:hover::after, 
-        .social-link.active-link::after {
-            width: auto;
-            margin-left: 6px;
-            opacity: 1;
-        }
-
-        .social-link:hover, .email-link:hover, .social-link.active-link {
+        /* Только подчеркивание при наведении, без изменения прозрачности */
+        .social-link:hover, .email-link:hover {
             border-color: black;
         }
 
-        /* Приглушение остальных при наведении */
-        .links-container:has(.social-link:hover) .social-link:not(:hover),
-        .links-container:has(.active-link) .social-link:not(.active-link) {
-            opacity: 0.3;
-            filter: blur(1px);
-        }
-
+        #discord-btn { min-width: 0; }
         .email-link { margin-top: 5px; }
 
         .f1 { font-family: 'CustomFont1', sans-serif; }
@@ -214,21 +134,18 @@
 
         <div class="links-container">
             <div class="social-row">
-                <a href="https://instagram.com/ogdnka" class="social-link" data-info="@ogdnka">inst</a>
-                <span class="divider">/</span>
-                <a href="https://t.me/eeleve" class="social-link" data-info="tgk: 11">telegram</a>
-                <span class="divider">/</span>
-                <a id="discord-btn" class="social-link" data-info="@dnka" style="cursor:none;">discord</a>
-                <span class="divider">/</span>
-                <a href="https://twitch.tv/ogdnka" class="social-link" data-info="@ogdnka">twitch</a>
-                <span class="divider">/</span>
-                <a href="https://tiktok.com/@dnkanle" class="social-link" data-info="@dnkanle">tiktok</a>
+                <a href="https://instagram.com/ogdnka" class="social-link">inst</a>
+                <a href="https://t.me/eeleve" class="social-link">telegram</a>
+                <a id="discord-btn" class="social-link">discord</a>
+                <a href="https://twitch.tv/ogdnka" class="social-link">twitch</a>
+                <a href="https://tiktok.com/@dnkanle" class="social-link">tiktok</a>
             </div>
             <a href="mailto:ogdnka@gmail.com" class="email-link">ogdnka@gmail.com</a>
         </div>
     </div>
 
     <script>
+        // Анимация печати текста
         const text = "dnka";
         const typewriter = document.getElementById('typewriter');
         const fontClasses = ['f1', 'f2', 'f3'];
@@ -249,9 +166,11 @@
             setTimeout(animate, typeSpeed);
         }
 
+        // Логика кастомного курсора
         const cursor = document.getElementById('cursor');
-        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, firstMove = true;
-        let idleTimer;
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let firstMove = true;
 
         function lerp() {
             cursorX += (mouseX - cursorX) * 0.15;
@@ -261,71 +180,68 @@
             requestAnimationFrame(lerp);
         }
 
-        const showCursor = () => {
-            cursor.style.opacity = "1";
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                cursor.style.opacity = "0";
-            }, 600);
-        };
-
         const updatePosition = (x, y) => {
-            mouseX = x; mouseY = y;
-            if (firstMove) { cursorX = mouseX; cursorY = mouseY; firstMove = false; }
-            showCursor();
+            mouseX = x;
+            mouseY = y;
+            if (firstMove) {
+                cursorX = mouseX;
+                cursorY = mouseY;
+                firstMove = false;
+                cursor.style.opacity = "1";
+            }
         };
 
-        // События мыши
-        document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
         document.addEventListener('mouseenter', () => { cursor.style.opacity = "1"; });
-        document.addEventListener('mouseleave', () => { cursor.style.opacity = "0"; });
-
-        // События тача
-        document.addEventListener('touchstart', (e) => {
-            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-        document.addEventListener('touchmove', (e) => {
-            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        // Логика для мобильных: клик раскрывает инфо
-        const socialLinks = document.querySelectorAll('.social-link');
-        socialLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Если это не дискорд и инфо еще не открыто — открываем
-                if (!this.classList.contains('active-link')) {
-                    // Убираем активный класс у других
-                    socialLinks.forEach(l => l.classList.remove('active-link'));
-                    this.classList.add('active-link');
-                    
-                    // Если это ссылка (не дискорд), предотвращаем переход при первом клике на мобиле
-                    if (this.id !== 'discord-btn' && window.innerWidth < 1024) {
-                        e.preventDefault();
-                    }
-                }
-            });
+        document.addEventListener('mouseleave', () => { 
+            cursor.style.opacity = "0"; 
+            firstMove = true; 
         });
 
-        // Сброс состояния при клике вне кнопок
-        document.addEventListener('touchstart', (e) => {
-            if (!e.target.closest('.social-link')) {
-                socialLinks.forEach(l => l.classList.remove('active-link'));
-            }
-        }, { passive: true });
+        document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
+        document.addEventListener('touchstart', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+        document.addEventListener('touchmove', (e) => updatePosition(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
-        // Discord Copy
+        // Исправлено: Копирование Discord ника (универсальный метод для мобилок и ПК)
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            navigator.clipboard.writeText("dnka").then(() => {
-                const originalInfo = this.getAttribute('data-info');
-                this.setAttribute('data-info', "copied!");
-                setTimeout(() => { this.setAttribute('data-info', originalInfo); }, 1500);
-            });
+            const nick = "dnka";
+            const originalText = "discord";
+
+            function showSuccess() {
+                discordBtn.textContent = "copied!";
+                setTimeout(() => { discordBtn.textContent = originalText; }, 1000);
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(nick).then(showSuccess);
+            } else {
+                // Резервный метод для мобильных WebView
+                const textArea = document.createElement("textarea");
+                textArea.value = nick;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch (err) {
+                    console.error('Ошибка копирования', err);
+                }
+                document.body.removeChild(textArea);
+            }
         });
 
-        // Предотвращение зума
+        // Блокировка системного зума
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
 
         window.onload = () => { animate(); lerp(); };
     </script>
