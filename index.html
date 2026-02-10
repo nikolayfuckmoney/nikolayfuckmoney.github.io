@@ -23,7 +23,7 @@
             justify-content: center;
             align-items: center; 
             font-family: sans-serif;
-            touch-action: none; 
+            touch-action: pan-y; 
             -webkit-user-select: none;
             user-select: none;
             cursor: none;
@@ -67,7 +67,7 @@
         .main-container {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Центровка контента */
+            align-items: center;
             width: 85vw;
             max-width: 450px;
             opacity: 0;
@@ -77,10 +77,11 @@
 
         @keyframes fadeIn { to { opacity: 1; } }
 
+        /* Эффект блюра при фокусе на ссылках */
+        body:has(.active-link) #typewriter,
+        body:has(.active-link) .photo-wrapper,
         body:has(.social-link:hover) #typewriter,
-        body:has(.social-link:hover) .photo-wrapper,
-        body:has(.email-link:hover) #typewriter,
-        body:has(.email-link:hover) .photo-wrapper {
+        body:has(.social-link:hover) .photo-wrapper {
             filter: blur(5px) grayscale(0.5);
             opacity: 0.4;
         }
@@ -104,8 +105,8 @@
             aspect-ratio: 1 / 1;
             overflow: hidden;
             margin-bottom: 20px;
-            border-radius: 0; /* Острые края */
-            box-shadow: none; /* Без теней */
+            border-radius: 0;
+            box-shadow: none;
         }
 
         .photo-wrapper img {
@@ -119,19 +120,19 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Центровка ссылок */
-            gap: 12px;
-            z-index: 100;
+            align-items: center;
+            gap: 15px;
+            z-index: 1001; /* Выше шума */
         }
 
         .social-row {
             display: flex;
             flex-direction: row;
-            gap: 16px; 
-            justify-content: center; /* Кнопки по центру */
+            justify-content: center;
             flex-wrap: wrap;
             width: 100%;
             align-items: center;
+            row-gap: 8px; /* Зазор при переносе строк */
         }
 
         .social-link, .email-link {
@@ -147,17 +148,15 @@
             transition: all 0.3s ease;
             position: relative;
             white-space: nowrap;
+            padding: 2px 0;
         }
 
-        /* Черный разделитель / */
-        .social-link:not(:first-child)::before {
-            content: "/";
-            margin-right: 16px; 
-            color: black; /* Теперь черный */
-            font-weight: normal;
+        /* Разделитель как отдельный элемент для надежности клика */
+        .divider {
+            color: black;
+            margin: 0 12px;
+            user-select: none;
             pointer-events: none;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .social-link::after {
@@ -173,20 +172,23 @@
             pointer-events: none;
         }
 
-        .social-link:hover::after {
+        /* Состояние активации (hover или активный тап) */
+        .social-link:hover::after, 
+        .social-link.active-link::after {
             width: auto;
             margin-left: 6px;
             opacity: 1;
         }
 
-        .links-container:hover .social-link:not(:hover),
-        .links-container:hover .email-link:not(:hover) {
-            opacity: 0.3;
-            filter: blur(1px);
+        .social-link:hover, .email-link:hover, .social-link.active-link {
+            border-color: black;
         }
 
-        .social-link:hover, .email-link:hover {
-            border-color: black;
+        /* Приглушение остальных при наведении */
+        .links-container:has(.social-link:hover) .social-link:not(:hover),
+        .links-container:has(.active-link) .social-link:not(.active-link) {
+            opacity: 0.3;
+            filter: blur(1px);
         }
 
         .email-link { margin-top: 5px; }
@@ -213,9 +215,13 @@
         <div class="links-container">
             <div class="social-row">
                 <a href="https://instagram.com/ogdnka" class="social-link" data-info="@ogdnka">inst</a>
+                <span class="divider">/</span>
                 <a href="https://t.me/eeleve" class="social-link" data-info="tgk: 11">telegram</a>
-                <a id="discord-btn" class="social-link" data-info="@dnka">discord</a>
+                <span class="divider">/</span>
+                <a id="discord-btn" class="social-link" data-info="@dnka" style="cursor:none;">discord</a>
+                <span class="divider">/</span>
                 <a href="https://twitch.tv/ogdnka" class="social-link" data-info="@ogdnka">twitch</a>
+                <span class="divider">/</span>
                 <a href="https://tiktok.com/@dnkanle" class="social-link" data-info="@dnkanle">tiktok</a>
             </div>
             <a href="mailto:ogdnka@gmail.com" class="email-link">ogdnka@gmail.com</a>
@@ -269,10 +275,12 @@
             showCursor();
         };
 
+        // События мыши
         document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
         document.addEventListener('mouseenter', () => { cursor.style.opacity = "1"; });
         document.addEventListener('mouseleave', () => { cursor.style.opacity = "0"; });
 
+        // События тача
         document.addEventListener('touchstart', (e) => {
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: true });
@@ -280,23 +288,44 @@
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: true });
 
+        // Логика для мобильных: клик раскрывает инфо
+        const socialLinks = document.querySelectorAll('.social-link');
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Если это не дискорд и инфо еще не открыто — открываем
+                if (!this.classList.contains('active-link')) {
+                    // Убираем активный класс у других
+                    socialLinks.forEach(l => l.classList.remove('active-link'));
+                    this.classList.add('active-link');
+                    
+                    // Если это ссылка (не дискорд), предотвращаем переход при первом клике на мобиле
+                    if (this.id !== 'discord-btn' && window.innerWidth < 1024) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+
+        // Сброс состояния при клике вне кнопок
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('.social-link')) {
+                socialLinks.forEach(l => l.classList.remove('active-link'));
+            }
+        }, { passive: true });
+
+        // Discord Copy
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('click', function(e) {
             e.preventDefault();
             navigator.clipboard.writeText("dnka").then(() => {
-                const originalInfo = discordBtn.getAttribute('data-info');
-                discordBtn.setAttribute('data-info', "copied!");
-                setTimeout(() => { discordBtn.setAttribute('data-info', originalInfo); }, 1500);
+                const originalInfo = this.getAttribute('data-info');
+                this.setAttribute('data-info', "copied!");
+                setTimeout(() => { this.setAttribute('data-info', originalInfo); }, 1500);
             });
         });
 
+        // Предотвращение зума
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (e) => {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) e.preventDefault();
-            lastTouchEnd = now;
-        }, false);
 
         window.onload = () => { animate(); lerp(); };
     </script>
