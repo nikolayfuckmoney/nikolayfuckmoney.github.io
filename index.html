@@ -61,13 +61,13 @@
             transform: translate(-50%, -50%);
             will-change: transform, opacity;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
 
         .main-container {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center; /* Центровка контента */
             width: 85vw;
             max-width: 450px;
             opacity: 0;
@@ -104,8 +104,8 @@
             aspect-ratio: 1 / 1;
             overflow: hidden;
             margin-bottom: 20px;
-            border-radius: 6px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border-radius: 0; /* Острые края */
+            box-shadow: none; /* Без теней */
         }
 
         .photo-wrapper img {
@@ -119,18 +119,19 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center; /* Центровка ссылок */
             gap: 12px;
             z-index: 100;
         }
 
         .social-row {
             display: flex;
-            flex-direction: row; /* Возвращено в ряд */
-            gap: 12px;
-            justify-content: flex-start;
+            flex-direction: row;
+            gap: 16px; 
+            justify-content: center; /* Кнопки по центру */
             flex-wrap: wrap;
             width: 100%;
+            align-items: center;
         }
 
         .social-link, .email-link {
@@ -148,7 +149,17 @@
             white-space: nowrap;
         }
 
-        /* Выезжающий текст без скобок, тем же шрифтом */
+        /* Черный разделитель / */
+        .social-link:not(:first-child)::before {
+            content: "/";
+            margin-right: 16px; 
+            color: black; /* Теперь черный */
+            font-weight: normal;
+            pointer-events: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+
         .social-link::after {
             content: attr(data-info);
             margin-left: 0px;
@@ -234,6 +245,7 @@
 
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, firstMove = true;
+        let idleTimer;
 
         function lerp() {
             cursorX += (mouseX - cursorX) * 0.15;
@@ -243,13 +255,30 @@
             requestAnimationFrame(lerp);
         }
 
+        const showCursor = () => {
+            cursor.style.opacity = "1";
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                cursor.style.opacity = "0";
+            }, 600);
+        };
+
         const updatePosition = (x, y) => {
             mouseX = x; mouseY = y;
-            if (firstMove) { cursorX = mouseX; cursorY = mouseY; firstMove = false; cursor.style.opacity = "1"; }
+            if (firstMove) { cursorX = mouseX; cursorY = mouseY; firstMove = false; }
+            showCursor();
         };
 
         document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
-        document.addEventListener('touchstart', (e) => { cursor.style.opacity = "0"; }, { passive: true });
+        document.addEventListener('mouseenter', () => { cursor.style.opacity = "1"; });
+        document.addEventListener('mouseleave', () => { cursor.style.opacity = "0"; });
+
+        document.addEventListener('touchstart', (e) => {
+            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        document.addEventListener('touchmove', (e) => {
+            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
 
         const discordBtn = document.getElementById('discord-btn');
         discordBtn.addEventListener('click', function(e) {
